@@ -21,6 +21,8 @@ use App\Http\Controllers\Api\BaseApiController;
 use App\Events\Backend\Access\User\UserPasswordChanged;
 use App\Repositories\Backend\Access\User\UserRepository;
 use Auth;
+use App\Models\Companies\Companies;
+use App\Models\Providers\Providers;
 
 class UsersController extends BaseApiController
 {
@@ -280,6 +282,129 @@ class UsersController extends BaseApiController
             'reason' => 'Invalid Inputs'
             ], 'Something went wrong !');
     }
+
+    /**
+     * Create
+     *
+     * @param Request $request
+     * @return string
+     */
+    public function createCompany(Request $request)
+    {
+        $repository = new UserRepository;
+        $input      = $request->all();
+        $input      = array_merge($input, ['profile_pic' => 'default.png']);
+        if($request->file('profile_pic'))
+        {
+            $imageName  = rand(11111, 99999) . '_user.' . $request->file('profile_pic')->getClientOriginalExtension();
+            if(strlen($request->file('profile_pic')->getClientOriginalExtension()) > 0)
+            {
+                $request->file('profile_pic')->move(base_path() . '/public/uploads/user/', $imageName);
+                $input = array_merge($input, ['profile_pic' => $imageName]);
+            }
+        }
+        $validator = Validator::make($request->all(), [
+            'email'     => 'required|unique:users|max:255',
+            'name'      => 'required',
+            'password'  => 'required',
+        ]);
+        if($validator->fails()) 
+        {
+            $messageData = '';
+            foreach($validator->messages()->toArray() as $message)
+            {
+                $messageData = $message[0];
+            }
+            return $this->failureResponse($validator->messages(), $messageData);
+        }
+        $user = $repository->createUserStub($input);
+        if($user)
+        {
+            Auth::loginUsingId($user->id, true);
+            $credentials = [
+                'email'     => $input['email'],
+                'password'  => $input['password']
+            ];
+            
+            $token          = JWTAuth::attempt($credentials);
+            $user           = Auth::user()->toArray();
+            $companydata    = [
+                'user_id'       => $user['id'],
+                'company_name'  => $request->get('company_name'),
+                'start_time'    => $request->get('start_time'),
+                'end_time'      => $request->get('end_time'),
+            ];
+            $company        = Companies::create($companydata);
+            $userData       = array_merge($user, $companydata, ['token' => $token]);  
+            $responseData   = $this->userTransformer->companyTranform((object)$userData);
+            return $this->successResponse($responseData);
+        }
+        return $this->setStatusCode(400)->failureResponse([
+            'reason' => 'Invalid Inputs'
+            ], 'Something went wrong !');
+    }
+
+    /**
+     * Create
+     *
+     * @param Request $request
+     * @return string
+     */
+    public function createProvider(Request $request)
+    {
+        $repository = new UserRepository;
+        $input      = $request->all();
+        $input      = array_merge($input, ['profile_pic' => 'default.png']);
+        if($request->file('profile_pic'))
+        {
+            $imageName  = rand(11111, 99999) . '_user.' . $request->file('profile_pic')->getClientOriginalExtension();
+            if(strlen($request->file('profile_pic')->getClientOriginalExtension()) > 0)
+            {
+                $request->file('profile_pic')->move(base_path() . '/public/uploads/user/', $imageName);
+                $input = array_merge($input, ['profile_pic' => $imageName]);
+            }
+        }
+        $validator = Validator::make($request->all(), [
+            'email'     => 'required|unique:users|max:255',
+            'name'      => 'required',
+            'password'  => 'required',
+        ]);
+        if($validator->fails()) 
+        {
+            $messageData = '';
+            foreach($validator->messages()->toArray() as $message)
+            {
+                $messageData = $message[0];
+            }
+            return $this->failureResponse($validator->messages(), $messageData);
+        }
+        $user = $repository->createUserStub($input);
+        if($user)
+        {
+            Auth::loginUsingId($user->id, true);
+            $credentials = [
+                'email'     => $input['email'],
+                'password'  => $input['password']
+            ];
+            
+            $token          = JWTAuth::attempt($credentials);
+            $user           = Auth::user()->toArray();
+            $providerData   = [
+                'user_id'               => $user['id'],
+                'level_of_experience'   => $request->get('level_of_experience'),
+                'current_company'       => $request->get('current_company')
+            ];
+            $provider       = Providers::create($providerData);
+            $userData       = array_merge($user, $providerData, ['token' => $token]);  
+            $responseData   = $this->userTransformer->providerTranform((object)$userData);
+            return $this->successResponse($responseData);
+        }
+        return $this->setStatusCode(400)->failureResponse([
+            'reason' => 'Invalid Inputs'
+            ], 'Something went wrong !');
+    }
+
+    
 
     /**
      * Forgot Password
