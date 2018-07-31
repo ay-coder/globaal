@@ -29,7 +29,13 @@ Route::group(['namespace' => 'Api',], function ()
     Route::get('config', 'UsersController@config')->name('api.config');
 });
 
+Route::group(['namespace' => 'Api', 'middleware' => 'jwt.customauth'], function () 
+{
+    Route::post('change-password', 'UsersController@changePassword')->name('api.change-password');
+    Route::post('update-password', 'UsersController@updageUserPassword')->name('api.update-user-password');
+    Route::get('logout', 'UsersController@logout')->name('api.logout');
+});
 Route::group(['middleware' => 'jwt.customauth'], function () 
 {
-    includeRouteFiles(__DIR__.'/Api/');
+    includeRouteFiles(__DIR__.'/API/');
 });
