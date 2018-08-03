@@ -27,6 +27,10 @@ Route::group(['namespace' => 'Api',], function ()
     Route::post('social-login', 'UsersController@socialLogin')->name('api.login');
     Route::post('forgotpassword', 'UsersController@forgotPassword')->name('api.forgotPassword');
     Route::get('config', 'UsersController@config')->name('api.config');
+
+    Route::get('experiences', 'APIExperiencesController@index')->name('api.experiences');
+
+    Route::get('master-categories', 'APIMasterCategoriesController@index')->name('mastercategories.index');
 });
 
 Route::group(['namespace' => 'Api', 'middleware' => 'jwt.customauth'], function () 
