@@ -2,18 +2,18 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use App\Http\Transformers\CompaniesTransformer;
+use App\Http\Transformers\MessagesTransformer;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Repositories\Companies\EloquentCompaniesRepository;
+use App\Repositories\Messages\EloquentMessagesRepository;
 
-class APICompaniesController extends BaseApiController
+class APIMessagesController extends BaseApiController
 {
     /**
-     * Companies Transformer
+     * Messages Transformer
      *
      * @var Object
      */
-    protected $companiesTransformer;
+    protected $messagesTransformer;
 
     /**
      * Repository
@@ -27,7 +27,7 @@ class APICompaniesController extends BaseApiController
      *
      * @var string
      */
-    protected $primaryKey = 'companiesId';
+    protected $primaryKey = 'messagesId';
 
     /**
      * __construct
@@ -35,58 +35,37 @@ class APICompaniesController extends BaseApiController
      */
     public function __construct()
     {
-        $this->repository                       = new EloquentCompaniesRepository();
-        $this->companiesTransformer = new CompaniesTransformer();
+        $this->repository                       = new EloquentMessagesRepository();
+        $this->messagesTransformer = new MessagesTransformer();
     }
 
     /**
-     * List of All Companies
+     * List of All Messages
      *
      * @param Request $request
      * @return json
      */
     public function index(Request $request)
     {
-        $paginate   = $request->get('paginate') ? $request->get('paginate') : false;
-        $orderBy    = $request->get('orderBy') ? $request->get('orderBy') : 'id';
-        $order      = $request->get('order') ? $request->get('order') : 'ASC';
-        $items      = $paginate ? $this->repository->model->orderBy($orderBy, $order)->paginate($paginate)->items() : $this->repository->getAll($orderBy, $order);
-
-        if(isset($items) && count($items))
+        if($request->has('provider_id') && $request->has('patient_id'))
         {
-            $itemsOutput = $this->companiesTransformer->companyTranform($items);
+            $userInfo   = $this->getAuthenticatedUser();
+            $providerId = $request->get('provider_id');
+            $patientId  = $request->get('patient_id');
+            $messages   = $this->repository->getAll($providerId, $patientId);
 
-            return $this->successResponse($itemsOutput);
+
+            if($messages && count($messages))
+            {
+                $itemsOutput = $this->messagesTransformer->messageTranform($messages);
+
+                return $this->successResponse($itemsOutput);
+            }
         }
-
+        
         return $this->setStatusCode(400)->failureResponse([
-            'message' => 'Unable to find Companies!'
-            ], 'No Companies Found !');
-    }
-
-    /**
-     * Get All
-     *
-     * @param Request $request
-     * @return json
-     */
-    public function getAll(Request $request)
-    {
-        $paginate   = $request->get('paginate') ? $request->get('paginate') : false;
-        $orderBy    = $request->get('orderBy') ? $request->get('orderBy') : 'id';
-        $order      = $request->get('order') ? $request->get('order') : 'ASC';
-        $items      = $paginate ? $this->repository->model->orderBy($orderBy, $order)->paginate($paginate)->items() : $this->repository->getAll($orderBy, $order);
-
-        if(isset($items) && count($items))
-        {
-            $itemsOutput = $this->companiesTransformer->companyTranform($items);
-
-            return $this->successResponse($itemsOutput);
-        }
-
-        return $this->setStatusCode(400)->failureResponse([
-            'message' => 'Unable to find Companies!'
-            ], 'No Companies Found !');
+            'message' => 'Unable to find Messages!'
+            ], 'No Messages Found !');
     }
 
     /**
@@ -97,13 +76,19 @@ class APICompaniesController extends BaseApiController
      */
     public function create(Request $request)
     {
-        $model = $this->repository->create($request->all());
+        $input = $request->all();
+        $input = array_merge($input, ['user_id' => access()->user()->id]);
+
+        $model = $this->repository->create($input);
 
         if($model)
         {
-            $responseData = $this->companiesTransformer->transform($model);
+            $responseData = $this->messagesTransformer->transform($model);
 
-            return $this->successResponse($responseData, 'Companies is Created Successfully');
+            return response()->json([
+                    'message'   => 'Messages is Created Successfully',
+                    'status'    => true,
+                    ], 200);
         }
 
         return $this->setStatusCode(400)->failureResponse([
@@ -127,7 +112,7 @@ class APICompaniesController extends BaseApiController
 
             if($itemData)
             {
-                $responseData = $this->companiesTransformer->transform($itemData);
+                $responseData = $this->messagesTransformer->transform($itemData);
 
                 return $this->successResponse($responseData, 'View Item');
             }
@@ -155,9 +140,9 @@ class APICompaniesController extends BaseApiController
             if($status)
             {
                 $itemData       = $this->repository->getById($itemId);
-                $responseData   = $this->companiesTransformer->transform($itemData);
+                $responseData   = $this->messagesTransformer->transform($itemData);
 
-                return $this->successResponse($responseData, 'Companies is Edited Successfully');
+                return $this->successResponse($responseData, 'Messages is Edited Successfully');
             }
         }
 
@@ -183,8 +168,8 @@ class APICompaniesController extends BaseApiController
             if($status)
             {
                 return $this->successResponse([
-                    'success' => 'Companies Deleted'
-                ], 'Companies is Deleted Successfully');
+                    'success' => 'Messages Deleted'
+                ], 'Messages is Deleted Successfully');
             }
         }
 

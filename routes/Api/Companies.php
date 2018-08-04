@@ -1,7 +1,7 @@
 <?php
 Route::group(['namespace' => 'Api'], function()
 {
-    Route::get('companies', 'APICompaniesController@index')->name('companies.index');
+    
     Route::get('all_companies', 'APICompaniesController@getAll')->name('companies.all-companies');
 
     Route::post('companies/create', 'APICompaniesController@create')->name('companies.create');

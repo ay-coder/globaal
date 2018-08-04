@@ -31,6 +31,8 @@ Route::group(['namespace' => 'Api',], function ()
     Route::get('experiences', 'APIExperiencesController@index')->name('api.experiences');
 
     Route::get('master-categories', 'APIMasterCategoriesController@index')->name('mastercategories.index');
+
+    Route::get('companies', 'APICompaniesController@index')->name('companies.index');
 });
 
 Route::group(['namespace' => 'Api', 'middleware' => 'jwt.customauth'], function () 

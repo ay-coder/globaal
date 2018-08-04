@@ -2,18 +2,18 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
-use App\Http\Transformers\CompaniesTransformer;
+use App\Http\Transformers\PatientTransformer;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Repositories\Companies\EloquentCompaniesRepository;
+use App\Repositories\Patient\EloquentPatientRepository;
 
-class APICompaniesController extends BaseApiController
+class APIPatientController extends BaseApiController
 {
     /**
-     * Companies Transformer
+     * Patient Transformer
      *
      * @var Object
      */
-    protected $companiesTransformer;
+    protected $patientTransformer;
 
     /**
      * Repository
@@ -27,7 +27,7 @@ class APICompaniesController extends BaseApiController
      *
      * @var string
      */
-    protected $primaryKey = 'companiesId';
+    protected $primaryKey = 'patientId';
 
     /**
      * __construct
@@ -35,12 +35,12 @@ class APICompaniesController extends BaseApiController
      */
     public function __construct()
     {
-        $this->repository                       = new EloquentCompaniesRepository();
-        $this->companiesTransformer = new CompaniesTransformer();
+        $this->repository                       = new EloquentPatientRepository();
+        $this->patientTransformer = new PatientTransformer();
     }
 
     /**
-     * List of All Companies
+     * List of All Patient
      *
      * @param Request $request
      * @return json
@@ -54,39 +54,14 @@ class APICompaniesController extends BaseApiController
 
         if(isset($items) && count($items))
         {
-            $itemsOutput = $this->companiesTransformer->companyTranform($items);
+            $itemsOutput = $this->patientTransformer->transformCollection($items);
 
             return $this->successResponse($itemsOutput);
         }
 
         return $this->setStatusCode(400)->failureResponse([
-            'message' => 'Unable to find Companies!'
-            ], 'No Companies Found !');
-    }
-
-    /**
-     * Get All
-     *
-     * @param Request $request
-     * @return json
-     */
-    public function getAll(Request $request)
-    {
-        $paginate   = $request->get('paginate') ? $request->get('paginate') : false;
-        $orderBy    = $request->get('orderBy') ? $request->get('orderBy') : 'id';
-        $order      = $request->get('order') ? $request->get('order') : 'ASC';
-        $items      = $paginate ? $this->repository->model->orderBy($orderBy, $order)->paginate($paginate)->items() : $this->repository->getAll($orderBy, $order);
-
-        if(isset($items) && count($items))
-        {
-            $itemsOutput = $this->companiesTransformer->companyTranform($items);
-
-            return $this->successResponse($itemsOutput);
-        }
-
-        return $this->setStatusCode(400)->failureResponse([
-            'message' => 'Unable to find Companies!'
-            ], 'No Companies Found !');
+            'message' => 'Unable to find Patient!'
+            ], 'No Patient Found !');
     }
 
     /**
@@ -101,9 +76,9 @@ class APICompaniesController extends BaseApiController
 
         if($model)
         {
-            $responseData = $this->companiesTransformer->transform($model);
+            $responseData = $this->patientTransformer->transform($model);
 
-            return $this->successResponse($responseData, 'Companies is Created Successfully');
+            return $this->successResponse($responseData, 'Patient is Created Successfully');
         }
 
         return $this->setStatusCode(400)->failureResponse([
@@ -127,7 +102,7 @@ class APICompaniesController extends BaseApiController
 
             if($itemData)
             {
-                $responseData = $this->companiesTransformer->transform($itemData);
+                $responseData = $this->patientTransformer->transform($itemData);
 
                 return $this->successResponse($responseData, 'View Item');
             }
@@ -155,9 +130,9 @@ class APICompaniesController extends BaseApiController
             if($status)
             {
                 $itemData       = $this->repository->getById($itemId);
-                $responseData   = $this->companiesTransformer->transform($itemData);
+                $responseData   = $this->patientTransformer->transform($itemData);
 
-                return $this->successResponse($responseData, 'Companies is Edited Successfully');
+                return $this->successResponse($responseData, 'Patient is Edited Successfully');
             }
         }
 
@@ -183,8 +158,8 @@ class APICompaniesController extends BaseApiController
             if($status)
             {
                 return $this->successResponse([
-                    'success' => 'Companies Deleted'
-                ], 'Companies is Deleted Successfully');
+                    'success' => 'Patient Deleted'
+                ], 'Patient is Deleted Successfully');
             }
         }
 
