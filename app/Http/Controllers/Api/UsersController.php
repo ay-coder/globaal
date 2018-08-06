@@ -23,6 +23,7 @@ use App\Repositories\Backend\Access\User\UserRepository;
 use Auth;
 use App\Models\Companies\Companies;
 use App\Models\Providers\Providers;
+use App\Models\ProviderServices\ProviderServices;
 
 class UsersController extends BaseApiController
 {
@@ -394,9 +395,30 @@ class UsersController extends BaseApiController
                 'level_of_experience'   => $request->get('level_of_experience'),
                 'current_company'       => $request->get('current_company')
             ];
+
+
+
+
+
             $provider       = Providers::create($providerData);
+
+            if($request->has('services') && is_array($request->get('services')))
+            {
+                foreach($request->get('services') as $service)
+                {
+                    $providerServiceData[] = [
+                        'provider_id'   => $user['id'],
+                        'service_id'    => $service
+                    ];
+                }
+
+                ProviderServices::insert($providerServiceData);
+            }
+
+            $services = ProviderServices::where('provider_id', $user['id'])->with('service')->get();
+
             $userData       = array_merge($user, $providerData, ['token' => $token]);  
-            $responseData   = $this->userTransformer->providerTranform((object)$userData);
+            $responseData   = $this->userTransformer->providerTranform((object)$userData, (object) $services);
             return $this->successResponse($responseData);
         }
         return $this->setStatusCode(400)->failureResponse([
