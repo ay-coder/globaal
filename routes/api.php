@@ -43,5 +43,5 @@ Route::group(['namespace' => 'Api', 'middleware' => 'jwt.customauth'], function 
 });
 Route::group(['middleware' => 'jwt.customauth'], function () 
 {
-    includeRouteFiles(__DIR__.'/API/');
+    includeRouteFiles(__DIR__.'/Api/');
 });
