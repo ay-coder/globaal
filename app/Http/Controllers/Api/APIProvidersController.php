@@ -47,14 +47,19 @@ class APIProvidersController extends BaseApiController
      */
     public function index(Request $request)
     {
-        $paginate   = $request->get('paginate') ? $request->get('paginate') : false;
+        $perPage    = $request->get('per_page') ? $request->get('per_page') : 100;
+        $offset     = $request->get('page') ? $request->get('page') : 0;
         $orderBy    = $request->get('orderBy') ? $request->get('orderBy') : 'id';
         $order      = $request->get('order') ? $request->get('order') : 'ASC';
-        $items      = $paginate ? $this->repository->model->orderBy($orderBy, $order)->paginate($paginate)->items() : $this->repository->getAll($orderBy, $order);
+        $items     = $this->repository->model->with(['services', 'services.service', 'user', 'leavelOfExperience', 'company'])
+        ->orderBy($orderBy, $order)
+        ->limit($perPage)
+        ->offset($offset)
+        ->get();
 
         if(isset($items) && count($items))
         {
-            $itemsOutput = $this->providersTransformer->transformCollection($items);
+            $itemsOutput = $this->providersTransformer->transformProviders($items);
 
             return $this->successResponse($itemsOutput);
         }

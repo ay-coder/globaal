@@ -72,10 +72,11 @@ class APICompaniesController extends BaseApiController
      */
     public function getAll(Request $request)
     {
-        $paginate   = $request->get('paginate') ? $request->get('paginate') : false;
+        $perPage    = $request->get('per_page') ? $request->get('per_page') : 100;
+        $offset     = $request->get('page') ? $request->get('page') : 0;
         $orderBy    = $request->get('orderBy') ? $request->get('orderBy') : 'id';
         $order      = $request->get('order') ? $request->get('order') : 'ASC';
-        $items      = $paginate ? $this->repository->model->orderBy($orderBy, $order)->paginate($paginate)->items() : $this->repository->getAll($orderBy, $order);
+        $items      = $paginate ? $this->repository->model->orderBy($orderBy, $order)->limit($perPage, $offset)->items() : $this->repository->getAll($orderBy, $order);
 
         if(isset($items) && count($items))
         {
@@ -191,5 +192,29 @@ class APICompaniesController extends BaseApiController
         return $this->setStatusCode(404)->failureResponse([
             'reason' => 'Invalid Inputs'
         ], 'Something went wrong !');
+    }
+
+    public function getAllProviders(Request $request)
+    {
+        $perPage    = $request->get('per_page') ? $request->get('per_page') : 100;
+        $offset     = $request->get('page') ? $request->get('page') : 0;
+        $orderBy    = $request->get('orderBy') ? $request->get('orderBy') : 'id';
+        $order      = $request->get('order') ? $request->get('order') : 'ASC';
+        $items      = $this->repository->model->with(['providers', 'providers.user'])
+        ->orderBy($orderBy, $order)
+        ->limit($perPage)
+        ->offset($offset)
+        ->get();
+
+        if(isset($items) && count($items))
+        {
+            $itemsOutput = $this->companiesTransformer->companyTranformWithProviders($items);
+
+            return $this->successResponse($itemsOutput);
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+            'message' => 'Unable to find Companies!'
+            ], 'No Companies Found !');       
     }
 }

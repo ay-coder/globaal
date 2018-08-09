@@ -2,6 +2,7 @@
 namespace App\Http\Transformers;
 
 use App\Http\Transformers;
+use URL;
 
 class ProvidersTransformer extends Transformer
 {
@@ -21,5 +22,43 @@ class ProvidersTransformer extends Transformer
         return [
             "providersId" => (int) $item->id, "providersUserId" =>  $item->user_id, "providersLevelOfExperience" =>  $item->level_of_experience, "providersCurrentCompany" =>  $item->current_company, "providersCreatedAt" =>  $item->created_at, "providersUpdatedAt" =>  $item->updated_at, 
         ];
+    }
+
+    public function transformProviders($items)
+    {
+        $response = [];
+
+        if($items)
+        {
+            foreach($items as $item)
+            {
+                $allServices = [];
+
+                if(isset($item->services) && count($item->services))
+                {
+                    foreach($item->services as $service)
+                    {
+                        $allServices[] = [
+                            'service_id' => $service->service_id,
+                            'title'      => isset($service->service) ? $service->service->title : ''
+                        ];
+                    }
+                }
+
+                $response[] = [
+                    'provider_id'   => $item->id,
+                    'name'          => $item->user->name,
+                    'email'         => $item->user->email,
+                    'company_id'    => $item->company->id,
+                    'company_name'  => $item->company->name,
+                    'profile_pic'   => URL::to('/').'/uploads/user/' . $item->user->profile_pic, 
+                    'level_of_experience'   => $item->leavelOfExperience->level_of_experience,
+                    'services'      => $allServices
+
+                ];
+            }
+        }
+
+        return $response;
     }
 }

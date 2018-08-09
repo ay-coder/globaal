@@ -237,7 +237,7 @@ class EloquentCompaniesRepository extends DbRepository
      */
     public function getAll($orderBy = 'id', $sort = 'asc')
     {
-        return $this->model->orderBy($orderBy, $sort)->get();
+        return $this->model->with(['providers', 'providers.user'])->orderBy($orderBy, $sort)->get();
     }
 
     /**
