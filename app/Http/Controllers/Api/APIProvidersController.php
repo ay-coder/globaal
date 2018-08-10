@@ -104,7 +104,7 @@ class APIProvidersController extends BaseApiController
         $userInfo   = $this->getAuthenticatedUser();
         $providerId = $request->has('provider_id') ? $request->get('provider_id') : $userInfo->id;
 
-        $item       = $this->repository->model->with(['companies', 'companies.company', 'services', 'services.service', 'user', 'leavelOfExperience', 'company'])
+        $item       = $this->repository->model->with(['companies', 'companies.company', 'services', 'services.service', 'user', 'leavelOfExperience', 'company', 'credentials'])
         ->where('id', $providerId)
         ->first();
 

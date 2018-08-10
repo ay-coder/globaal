@@ -6,6 +6,7 @@ use App\Models\Companies\Companies;
 use App\Models\Experiences\Experiences;
 use App\Models\CompanyProviders\CompanyProviders;
 use App\Models\ProviderTypes\ProviderTypes;
+use App\Models\Credentials\Credentials;
 
 trait Relationship
 {
@@ -43,6 +44,11 @@ trait Relationship
     public function companies()
     {
         return $this->hasMany(CompanyProviders::class, 'provider_id');
+    }
+
+    public function credentials()
+    {
+        return $this->hasMany(Credentials::class, 'provider_id');
     }
 
     public function provider_type()

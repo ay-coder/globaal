@@ -35,10 +35,10 @@ class MessagesTransformer extends Transformer
             {
                 $isRead     = $currentUserId == $item->user_id ? 1 : $item->is_read;
                 $response[] = [
-                    'message_id'    => $item->id,
-                    'user_id'       => $item->user_id,
-                    'provider_id'   => $item->provider_id,
-                    'patient_id'    => $item->patient_id,
+                    'message_id'    => (int) $item->id,
+                    'user_id'       => (int) $item->user_id,
+                    'provider_id'   => (int) $item->provider_id,
+                    'patient_id'    => (int) $item->patient_id,
                     'message'       => $item->message,
                     'provider_name' => $item->provider->name,
                     'provider_pic'  => URL::to('/').'/uploads/user/' . $item->provider->profile_pic,

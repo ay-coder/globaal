@@ -47,14 +47,41 @@ class APIMessagesController extends BaseApiController
      */
     public function index(Request $request)
     {
+        $userInfo   = $this->getAuthenticatedUser();
+        
+        if($userInfo->user_type == 1)
+        {
+            $messages = $this->repository->getAllUserMessages($userInfo->id);
+        }
+        else
+        {
+            $messages = $this->repository->getAllProviderMessages($userInfo->id);   
+        }
+
+        if($messages && count($messages))
+        {
+            $itemsOutput = $this->messagesTransformer->messageTranform($messages);
+
+            return $this->successResponse($itemsOutput);
+        }
+        
+        return $this->setStatusCode(400)->failureResponse([
+            'message' => 'Unable to find Messages!'
+            ], 'No Messages Found !');
+    }
+
+    /**
+     * List of All Messages
+     *
+     * @param Request $request
+     * @return json
+     */
+    public function getChat(Request $request)
+    {
         if($request->has('provider_id') && $request->has('patient_id'))
         {
-            $userInfo   = $this->getAuthenticatedUser();
-            $providerId = $request->get('provider_id');
-            $patientId  = $request->get('patient_id');
-            $messages   = $this->repository->getAll($providerId, $patientId);
-
-
+            $messages = $this->repository->getAllChat($request->get('provider_id'), $request->get('patient_id'));   
+            
             if($messages && count($messages))
             {
                 $itemsOutput = $this->messagesTransformer->messageTranform($messages);
@@ -62,6 +89,7 @@ class APIMessagesController extends BaseApiController
                 return $this->successResponse($itemsOutput);
             }
         }
+
         
         return $this->setStatusCode(400)->failureResponse([
             'message' => 'Unable to find Messages!'

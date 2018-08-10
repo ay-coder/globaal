@@ -1,30 +1,30 @@
-<?php namespace App\Repositories\Messages;
+<?php namespace App\Repositories\Credentials;
 
 /**
- * Class EloquentMessagesRepository
+ * Class EloquentCredentialsRepository
  *
  * @author Anuj Jaha ( er.anujjaha@gmail.com)
  */
 
-use App\Models\Messages\Messages;
+use App\Models\Credentials\Credentials;
 use App\Repositories\DbRepository;
 use App\Exceptions\GeneralException;
 
-class EloquentMessagesRepository extends DbRepository
+class EloquentCredentialsRepository extends DbRepository
 {
     /**
-     * Messages Model
+     * Credentials Model
      *
      * @var Object
      */
     public $model;
 
     /**
-     * Messages Title
+     * Credentials Title
      *
      * @var string
      */
-    public $moduleTitle = 'Messages';
+    public $moduleTitle = 'Credentials';
 
     /**
      * Table Headers
@@ -33,11 +33,10 @@ class EloquentMessagesRepository extends DbRepository
      */
     public $tableHeaders = [
         'id'        => 'Id',
-'user_id'        => 'User_id',
 'provider_id'        => 'Provider_id',
-'patient_id'        => 'Patient_id',
-'message'        => 'Message',
-'is_read'        => 'Is_read',
+'title'        => 'Title',
+'description'        => 'Description',
+'status'        => 'Status',
 'created_at'        => 'Created_at',
 'updated_at'        => 'Updated_at',
 "actions"         => "Actions"
@@ -55,33 +54,27 @@ class EloquentMessagesRepository extends DbRepository
                 'searchable'    => true,
                 'sortable'      => true
             ],
-		'user_id' =>   [
-                'data'          => 'user_id',
-                'name'          => 'user_id',
-                'searchable'    => true,
-                'sortable'      => true
-            ],
 		'provider_id' =>   [
                 'data'          => 'provider_id',
                 'name'          => 'provider_id',
                 'searchable'    => true,
                 'sortable'      => true
             ],
-		'patient_id' =>   [
-                'data'          => 'patient_id',
-                'name'          => 'patient_id',
+		'title' =>   [
+                'data'          => 'title',
+                'name'          => 'title',
                 'searchable'    => true,
                 'sortable'      => true
             ],
-		'message' =>   [
-                'data'          => 'message',
-                'name'          => 'message',
+		'description' =>   [
+                'data'          => 'description',
+                'name'          => 'description',
                 'searchable'    => true,
                 'sortable'      => true
             ],
-		'is_read' =>   [
-                'data'          => 'is_read',
-                'name'          => 'is_read',
+		'status' =>   [
+                'data'          => 'status',
+                'name'          => 'status',
                 'searchable'    => true,
                 'sortable'      => true
             ],
@@ -146,13 +139,13 @@ class EloquentMessagesRepository extends DbRepository
      * @var array
      */
     public $moduleRoutes = [
-        'listRoute'     => 'messages.index',
-        'createRoute'   => 'messages.create',
-        'storeRoute'    => 'messages.store',
-        'editRoute'     => 'messages.edit',
-        'updateRoute'   => 'messages.update',
-        'deleteRoute'   => 'messages.destroy',
-        'dataRoute'     => 'messages.get-list-data'
+        'listRoute'     => 'credentials.index',
+        'createRoute'   => 'credentials.create',
+        'storeRoute'    => 'credentials.store',
+        'editRoute'     => 'credentials.edit',
+        'updateRoute'   => 'credentials.update',
+        'deleteRoute'   => 'credentials.destroy',
+        'dataRoute'     => 'credentials.get-list-data'
     ];
 
     /**
@@ -161,10 +154,10 @@ class EloquentMessagesRepository extends DbRepository
      * @var array
      */
     public $moduleViews = [
-        'listView'      => 'messages.index',
-        'createView'    => 'messages.create',
-        'editView'      => 'messages.edit',
-        'deleteView'    => 'messages.destroy',
+        'listView'      => 'credentials.index',
+        'createView'    => 'credentials.create',
+        'editView'      => 'credentials.edit',
+        'deleteView'    => 'credentials.destroy',
     ];
 
     /**
@@ -173,11 +166,11 @@ class EloquentMessagesRepository extends DbRepository
      */
     public function __construct()
     {
-        $this->model = new Messages;
+        $this->model = new Credentials;
     }
 
     /**
-     * Create Messages
+     * Create Credentials
      *
      * @param array $input
      * @return mixed
@@ -196,7 +189,7 @@ class EloquentMessagesRepository extends DbRepository
     }
 
     /**
-     * Update Messages
+     * Update Credentials
      *
      * @param int $id
      * @param array $input
@@ -217,7 +210,7 @@ class EloquentMessagesRepository extends DbRepository
     }
 
     /**
-     * Destroy Messages
+     * Destroy Credentials
      *
      * @param int $id
      * @return mixed
@@ -242,129 +235,9 @@ class EloquentMessagesRepository extends DbRepository
      * @param string $sort
      * @return mixed
      */
-    public function getAll($providerId = null, $patientId = null)
+    public function getAll($orderBy = 'id', $sort = 'asc')
     {
-        if($providerId && $patientId)
-        {
-            return $this->model->where([
-                'provider_id'   => $providerId,
-                'patient_id'    => $patientId
-            ])
-            ->with([
-                'patient',
-                'provider'
-            ])
-            ->get();
-        }
-
-        return false;
-    }
-
-    /**
-     * Get All
-     *
-     * @param string $orderBy
-     * @param string $sort
-     * @return mixed
-     */
-    public function getAllChat($providerId = null, $patientId = null)
-    {
-        if($providerId && $patientId)
-        {
-            return $this->model->where([
-                'provider_id'   => $providerId,
-                'patient_id'    => $patientId
-            ])->orWhere([
-                'provider_id'   => $patientId,
-                'patient_id'    => $providerId
-            ])
-            ->with([
-                'patient',
-                'provider'
-            ])
-            ->get();
-        }
-
-        return false;
-    }
-    
-    
-    /**
-     * Get All User Messages
-     * 
-     * @var int
-     */
-    public function getAllUserMessages($userId = null)
-    {
-        if($userId)
-        {
-            $messages = $this->model->where([
-                'patient_id' => $userId
-            ])
-            ->with([
-                'patient',
-                'provider'
-            ])
-            ->orderBy('id', 'desc')
-            ->get();
-
-            $response       = [];
-            $providerId     = [];
-
-            foreach($messages as $message)
-            {
-                if(in_array($message->provider_id, $providerId))
-                {
-                    continue;   
-                }
-
-                $providerId[]   = $message->provider_id;
-                $response[]     = $message;
-            }
-
-            return $response;
-        }
-        
-        return false;
-    }
-
-    /**
-     * Get ALl Provider Messages
-     * 
-     * @var [type]
-     */
-    public function getAllProviderMessages($userId = null)
-    {
-        if($userId)
-        {
-            $messages = $this->model->where([
-                'provider_id' => $userId
-            ])
-            ->with([
-                'patient',
-                'provider'
-            ])
-            ->orderBy('id', 'desc')
-            ->get();
-
-            $response      = [];
-            $patientId     = [];
-
-            foreach($messages as $message)
-            {
-                if(in_array($message->patient_id, $patientId))
-                {
-                    continue;   
-                }
-
-                $patientId[]    = $message->patient_id;
-                $response[]     = $message;
-            }
-
-            return $response;
-        }
-        
-        return false;
+        return $this->model->with('provider')->orderBy($orderBy, $sort)->get();
     }
 
     /**
