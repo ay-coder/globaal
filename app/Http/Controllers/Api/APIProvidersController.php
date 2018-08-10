@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use App\Http\Transformers\ProvidersTransformer;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Repositories\Providers\EloquentProvidersRepository;
+use App\Models\Services\Services;
+use App\Models\ProviderServices\ProviderServices;
 
 class APIProvidersController extends BaseApiController
 {
@@ -99,22 +101,22 @@ class APIProvidersController extends BaseApiController
      */
     public function show(Request $request)
     {
-        $itemId = (int) hasher()->decode($request->get($this->primaryKey));
+        $userInfo   = $this->getAuthenticatedUser();
+        $providerId = $request->has('provider_id') ? $request->get('provider_id') : $userInfo->id;
 
-        if($itemId)
+        $item       = $this->repository->model->with(['services', 'services.service', 'user', 'leavelOfExperience', 'company'])
+        ->where('id', $providerId)
+        ->first();
+
+        if(isset($item) && count($item))
         {
-            $itemData = $this->repository->getById($itemId);
+            $itemsOutput = $this->providersTransformer->transformSingleProviders($item);
 
-            if($itemData)
-            {
-                $responseData = $this->providersTransformer->transform($itemData);
-
-                return $this->successResponse($responseData, 'View Item');
-            }
+            return $this->successResponse($itemsOutput);
         }
 
         return $this->setStatusCode(400)->failureResponse([
-            'reason' => 'Invalid Inputs or Item not exists !'
+            'reason' => 'Invalid Inputs or Item Provider exists !'
             ], 'Something went wrong !');
     }
 
@@ -172,4 +174,96 @@ class APIProvidersController extends BaseApiController
             'reason' => 'Invalid Inputs'
         ], 'Something went wrong !');
     }
+
+    /**
+     * Add Service
+     *
+     * @param Request $request
+     * @return string
+     */
+    public function addService(Request $request)
+    {
+        if($request->has('service_id') && $request->get('service_id'))
+        {
+            $service    = Services::find($request->get('service_id'));
+            $userInfo   = $this->getAuthenticatedUser();
+            $providerId = $userInfo->id;
+
+            if($service)
+            {
+                $isExist = ProviderServices::where([
+                    'provider_id'   => $userInfo->id,
+                    'service_id'    => $request->get('service_id')
+                ])->count();
+
+                if(isset($isExist) && $isExist > 0 )
+                {
+                    return $this->setStatusCode(400)->failureResponse([
+                        'reason' => 'Already Service Added!'
+                        ], 'Already Service Added !');   
+                }
+
+                $status = ProviderServices::create([
+                    'provider_id'   => $userInfo->id,
+                    'service_id'    => $request->get('service_id')
+                ]);
+
+                if($status)
+                {
+                    $item       = $this->repository->model->with(['services', 'services.service', 'user', 'leavelOfExperience', 'company'])
+                    ->where('id', $providerId)
+                    ->first();
+
+                    if(isset($item) && count($item))
+                    {
+                        $itemsOutput = $this->providersTransformer->transformSingleProviders($item);
+
+                        return $this->successResponse($itemsOutput);
+                    } 
+                }
+            }
+        }
+       
+        return $this->setStatusCode(400)->failureResponse([
+            'reason' => 'Invalid Inputs or Item Provider exists !'
+            ], 'Something went wrong !');       
+    }
+
+    /**
+     * Remove Service
+     *
+     * @param Request $request
+     * @return string
+     */
+    public function removeService(Request $request)
+    {
+        if($request->has('service_id') && $request->get('service_id'))
+        {
+            $userInfo   = $this->getAuthenticatedUser();
+            $providerId = $userInfo->id;
+            $status     = ProviderServices::where([
+                'provider_id'   => $userInfo->id,
+                'service_id'    => $request->get('service_id')
+            ])->delete();
+
+            if($status)
+            {
+                $item       = $this->repository->model->with(['services', 'services.service', 'user', 'leavelOfExperience', 'company'])
+                ->where('id', $providerId)
+                ->first();
+
+                if(isset($item) && count($item))
+                {
+                    $itemsOutput = $this->providersTransformer->transformSingleProviders($item);
+
+                    return $this->successResponse($itemsOutput);
+                } 
+            }
+        }
+       
+        return $this->setStatusCode(400)->failureResponse([
+            'reason' => 'Invalid Inputs or No Service exists !'
+            ], 'Something went wrong !');       
+    }
+
 }

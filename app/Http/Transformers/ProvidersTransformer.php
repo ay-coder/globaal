@@ -39,24 +39,58 @@ class ProvidersTransformer extends Transformer
                     foreach($item->services as $service)
                     {
                         $allServices[] = [
-                            'service_id' => $service->service_id,
+                            'service_id' => (int) $service->service_id,
                             'title'      => isset($service->service) ? $service->service->title : ''
                         ];
                     }
                 }
 
                 $response[] = [
-                    'provider_id'   => $item->id,
+                    'provider_id'   => (int) $item->id,
                     'name'          => $item->user->name,
                     'email'         => $item->user->email,
-                    'company_id'    => $item->company->id,
-                    'company_name'  => $item->company->name,
+                    'company_id'    => (int) $item->company->id,
+                    'company_name'  => $this->nulltoBlank($item->company->company_name),
                     'profile_pic'   => URL::to('/').'/uploads/user/' . $item->user->profile_pic, 
                     'level_of_experience'   => $item->leavelOfExperience->level_of_experience,
                     'services'      => $allServices
 
                 ];
             }
+        }
+
+        return $response;
+    }
+
+    public function transformSingleProviders($item)
+    {
+        $response = [];
+
+        if($item)
+        {
+            $allServices = [];
+
+            if(isset($item->services) && count($item->services))
+            {
+                foreach($item->services as $service)
+                {
+                    $allServices[] = [
+                        'service_id' => (int) $service->service_id,
+                        'title'      => isset($service->service) ? $service->service->title : ''
+                    ];
+                }
+            }
+
+            $response[] = [
+                'provider_id'   => (int) $item->id,
+                'name'          => $item->user->name,
+                'email'         => $item->user->email,
+                'company_id'    => (int) $item->company->id,
+                'company_name'  => $this->nulltoBlank($item->company->company_name),
+                'profile_pic'   => URL::to('/').'/uploads/user/' . $item->user->profile_pic, 
+                'level_of_experience'   => $item->leavelOfExperience->level_of_experience,
+                'services'      => $allServices
+            ];
         }
 
         return $response;

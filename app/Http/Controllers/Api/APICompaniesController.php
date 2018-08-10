@@ -194,7 +194,43 @@ class APICompaniesController extends BaseApiController
         ], 'Something went wrong !');
     }
 
+    /**
+     * Get All Providers
+     * 
+     * @param Request $request
+     * @return json
+     */
     public function getAllProviders(Request $request)
+    {
+        $perPage    = $request->get('per_page') ? $request->get('per_page') : 100;
+        $offset     = $request->get('page') ? $request->get('page') : 0;
+        $orderBy    = $request->get('orderBy') ? $request->get('orderBy') : 'id';
+        $order      = $request->get('order') ? $request->get('order') : 'ASC';
+        $items      = $this->repository->model->with(['providers', 'providers.user'])
+        ->orderBy($orderBy, $order)
+        ->limit($perPage)
+        ->offset($offset)
+        ->get();
+
+        if(isset($items) && count($items))
+        {
+            $itemsOutput = $this->companiesTransformer->companyTranformWithProviders($items);
+
+            return $this->successResponse($itemsOutput);
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+            'message' => 'Unable to find Companies!'
+            ], 'No Companies Found !');       
+    }
+
+    /**
+     * Add Provider
+     * 
+     * @param Request $request
+     * @return json
+     */
+    public function addProvider(Request $request)
     {
         $perPage    = $request->get('per_page') ? $request->get('per_page') : 100;
         $offset     = $request->get('page') ? $request->get('page') : 0;

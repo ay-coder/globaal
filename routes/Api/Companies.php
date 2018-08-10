@@ -10,5 +10,8 @@ Route::group(['namespace' => 'Api'], function()
     Route::post('companies/delete', 'APICompaniesController@delete')->name('companies.delete');
 
     Route::post('get_companies_providers', 'APICompaniesController@getAllProviders')->name('companies.get-all-providers');
+
+    /*Route::post('companies/add-provider', 'APICompaniesController@addProvider')->name('companies.add-provider');
+    Route::post('companies/remove-provider', 'APICompaniesController@removeProvider')->name('companies.remove-provider');*/
 });
 ?>
