@@ -5,6 +5,7 @@ use App\Models\ProviderServices\ProviderServices;
 use App\Models\Companies\Companies;
 use App\Models\Experiences\Experiences;
 use App\Models\CompanyProviders\CompanyProviders;
+use App\Models\ProviderTypes\ProviderTypes;
 
 trait Relationship
 {
@@ -42,5 +43,10 @@ trait Relationship
     public function companies()
     {
         return $this->hasMany(CompanyProviders::class, 'provider_id');
+    }
+
+    public function provider_type()
+    {
+        return $this->belongsTo(ProviderTypes::class, 'provider_type_id');
     }
 }

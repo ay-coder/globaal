@@ -1,30 +1,30 @@
-<?php namespace App\Models\Providers;
+<?php namespace App\Models\ProviderTypes;
 
 /**
- * Class Providers
+ * Class ProviderTypes
  *
  * @author Anuj Jaha ( er.anujjaha@gmail.com)
  */
 
 use App\Models\BaseModel;
-use App\Models\Providers\Traits\Attribute\Attribute;
-use App\Models\Providers\Traits\Relationship\Relationship;
+use App\Models\ProviderTypes\Traits\Attribute\Attribute;
+use App\Models\ProviderTypes\Traits\Relationship\Relationship;
 
-class Providers extends BaseModel
+class ProviderTypes extends BaseModel
 {
     use Attribute, Relationship;
     /**
      * Database Table
      *
      */
-    protected $table = "data_providers";
+    protected $table = "data_provider_types";
 
     /**
      * Fillable Database Fields
      *
      */
     protected $fillable = [
-        "id", "user_id", "provider_type_id", "level_of_experience", "current_company", "created_at", "updated_at", 
+        "id", "title", "created_at", "updated_at", 
     ];
 
     /**

@@ -25,6 +25,10 @@ use App\Models\Companies\Companies;
 use App\Models\Providers\Providers;
 use App\Models\ProviderServices\ProviderServices;
 use App\Models\CompanyProviders\CompanyProviders;
+use App\Models\Services\Services;
+use App\Models\Experiences\Experiences;
+use App\Models\ProviderTypes\ProviderTypes;
+use App\Models\MasterCategories\MasterCategories;
 
 class UsersController extends BaseApiController
 {
@@ -394,15 +398,18 @@ class UsersController extends BaseApiController
             $providerData   = [
                 'user_id'               => $user['id'],
                 'level_of_experience'   => $request->get('level_of_experience'),
+                'provider_type_id'      => $request->get('provider_type_id'),
                 'current_company'       => $request->get('current_company')
             ];
 
 
             $provider       = Providers::create($providerData);
 
-            if($request->has('services') && is_array($request->get('services')))
+            if($request->has('services'))
             {
-                foreach($request->get('services') as $service)
+                $addServices = explode(',',  $request->get('services'));
+
+                foreach($addServices as $service)
                 {
                     $providerServiceData[] = [
                         'provider_id'   => $user['id'],
@@ -413,9 +420,10 @@ class UsersController extends BaseApiController
                 ProviderServices::insert($providerServiceData);
             }
 
-            if($request->has('companies') && is_array($request->get('companies')))
+            if($request->has('companies'))
             {
-                foreach($request->get('companies') as $company)
+                $addCompanies = explode(',', $request->get('companies'));
+                foreach($addCompanies as $company)
                 {
                     $providerCompanyData[] = [
                         'provider_id'   => $user['id'],
@@ -426,11 +434,16 @@ class UsersController extends BaseApiController
                 CompanyProviders::insert($providerCompanyData);
             }
 
-            $services = ProviderServices::where('provider_id', $user['id'])->with('service')->get();
-            $companies = CompanyProviders::where('provider_id', $user['id'])->with('company')->get();
+            $allServices = Services::all();
+            
 
+            $services = ProviderServices::where('provider_id', $user['id'])->with('service')->get();
+            
+            $companies = CompanyProviders::where('provider_id', $user['id'])->with('company')->get();
+            $myProvider = Providers::where('user_id', $user['id'])->with([
+                'provider_type'])->first();
             $userData       = array_merge($user, $providerData, ['token' => $token]);  
-            $responseData   = $this->userTransformer->providerTranform((object)$userData, (object) $services, (object) $companies);
+            $responseData   = $this->userTransformer->providerTranform((object)$userData, (object) $services, (object) $companies, $myProvider, $allServices);
             return $this->successResponse($responseData);
         }
         return $this->setStatusCode(400)->failureResponse([
@@ -672,9 +685,66 @@ class UsersController extends BaseApiController
 
     public function config(Request $request)
     {
+        $exps       = Experiences::get();
+        $providers  = ProviderTypes::get();
+        $categories = MasterCategories::with('services')->get();
+        $companies = companies::get();
+        $catResponse    = [];
+        
+
+        foreach($categories as $item)
+        {
+            $services = [];
+
+            if(isset($item->services))
+            {
+                foreach($item->services as $service)
+                {
+                    $services[] = [
+                        'id'    => $service->id,
+                        'title' => $service->title
+                    ];
+                }
+            }
+            $catResponse[] = [
+                'id'            => $item->id,
+                'title'         => $item->title,
+                'description'   => $item->description,
+                'services'      => $services
+            ];
+        }
+
+        $compData = [];
+        $expData  = [];
+        $providerData = [];
+        $serviceData = [];
+
+        foreach($companies as $comp)
+        {
+            $compData[] = [
+                'id'            => $comp->id,
+                'company_name'  => $comp->company_name,
+                'start_time'    => $comp->start_time,
+                'end_time'      => $comp->end_time,
+            ];
+        }
+
+        foreach($exps as $exp)
+        {
+            $expData[] = [
+                'id'            => $exp->id,
+                'exp'  => $exp->level_of_experience,
+            ];
+        }
+        
+
         $successResponse = [
             'support_number'        => '110001010',
-            'privacy_policy_url'    => 'https://www.google.co.in/'
+            'privacy_policy_url'    => 'https://www.google.co.in/',
+            'company_data'          => $compData,
+            'experiences_data'      => $expData,
+            'services_data'         => $catResponse
+
         ];
 
         return $this->successResponse($successResponse);
