@@ -24,6 +24,7 @@ use Auth;
 use App\Models\Companies\Companies;
 use App\Models\Providers\Providers;
 use App\Models\ProviderServices\ProviderServices;
+use App\Models\CompanyProviders\CompanyProviders;
 
 class UsersController extends BaseApiController
 {
@@ -397,9 +398,6 @@ class UsersController extends BaseApiController
             ];
 
 
-
-
-
             $provider       = Providers::create($providerData);
 
             if($request->has('services') && is_array($request->get('services')))
@@ -415,10 +413,24 @@ class UsersController extends BaseApiController
                 ProviderServices::insert($providerServiceData);
             }
 
+            if($request->has('companies') && is_array($request->get('companies')))
+            {
+                foreach($request->get('companies') as $company)
+                {
+                    $providerCompanyData[] = [
+                        'provider_id'   => $user['id'],
+                        'company_id'    => $company
+                    ];
+                }
+
+                CompanyProviders::insert($providerCompanyData);
+            }
+
             $services = ProviderServices::where('provider_id', $user['id'])->with('service')->get();
+            $companies = CompanyProviders::where('provider_id', $user['id'])->with('company')->get();
 
             $userData       = array_merge($user, $providerData, ['token' => $token]);  
-            $responseData   = $this->userTransformer->providerTranform((object)$userData, (object) $services);
+            $responseData   = $this->userTransformer->providerTranform((object)$userData, (object) $services, (object) $companies);
             return $this->successResponse($responseData);
         }
         return $this->setStatusCode(400)->failureResponse([

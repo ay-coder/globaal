@@ -4,6 +4,7 @@ use App\Models\Access\User\User;
 use App\Models\ProviderServices\ProviderServices;
 use App\Models\Companies\Companies;
 use App\Models\Experiences\Experiences;
+use App\Models\CompanyProviders\CompanyProviders;
 
 trait Relationship
 {
@@ -36,5 +37,10 @@ trait Relationship
     public function leavelOfExperience()
     {
     	return $this->belongsTo(Experiences::class, 'level_of_experience');
+    }
+
+    public function companies()
+    {
+        return $this->hasMany(CompanyProviders::class, 'provider_id');
     }
 }

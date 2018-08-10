@@ -60,18 +60,30 @@ class UserTransformer extends Transformer
         ];
     }
 
-    public function providerTranform($data, $services) 
+    public function providerTranform($data, $services, $companies) 
     {
-        $providerServices = [];
+        $providerServices   = [];
+        $providerCompanies  = [];
 
         if(isset($services) && count($services))
         {
             foreach($services as $service)
             {
                 $providerServices[] = [
-                    'service_id'            => (int) $service->id,
-                    'service_category_id'   => (int) $service->category_id,
-                    'title'                 => $this->nulltoBlank($service->title)
+                    'service_id'            => (int) $service->service->id,
+                    'service_category_id'   => (int) $service->service->category_id,
+                    'title'                 => $this->nulltoBlank($service->service->title)
+                ];
+            }
+        }
+
+        if(isset($companies) && count($companies))
+        {
+            foreach($companies as $company)
+            {
+                $providerCompanies[] = [
+                    'company_id'        => (int) $company->company->id,
+                    'company_name'      => $company->company->company_name
                 ];
             }
         }
@@ -98,7 +110,8 @@ class UserTransformer extends Transformer
             'social_token'          => $this->nulltoBlank($data->social_token),
             'level_of_experience'   => $this->nulltoBlank($data->level_of_experience),
             'current_company'       => $this->nulltoBlank($data->current_company),
-            'services'              => $providerServices
+            'services'              => $providerServices,
+            'companies'             => $providerCompanies
         ];
     }
     

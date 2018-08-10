@@ -53,7 +53,7 @@ class APIProvidersController extends BaseApiController
         $offset     = $request->get('page') ? $request->get('page') : 0;
         $orderBy    = $request->get('orderBy') ? $request->get('orderBy') : 'id';
         $order      = $request->get('order') ? $request->get('order') : 'ASC';
-        $items     = $this->repository->model->with(['services', 'services.service', 'user', 'leavelOfExperience', 'company'])
+        $items     = $this->repository->model->with(['companies', 'companies.company', 'services', 'services.service', 'user', 'leavelOfExperience', 'company'])
         ->orderBy($orderBy, $order)
         ->limit($perPage)
         ->offset($offset)
@@ -104,7 +104,7 @@ class APIProvidersController extends BaseApiController
         $userInfo   = $this->getAuthenticatedUser();
         $providerId = $request->has('provider_id') ? $request->get('provider_id') : $userInfo->id;
 
-        $item       = $this->repository->model->with(['services', 'services.service', 'user', 'leavelOfExperience', 'company'])
+        $item       = $this->repository->model->with(['companies', 'companies.company', 'services', 'services.service', 'user', 'leavelOfExperience', 'company'])
         ->where('id', $providerId)
         ->first();
 

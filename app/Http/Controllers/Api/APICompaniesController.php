@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Http\Transformers\CompaniesTransformer;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Repositories\Companies\EloquentCompaniesRepository;
+use App\Models\CompanyProviders\CompanyProviders;
 
 class APICompaniesController extends BaseApiController
 {
@@ -206,7 +207,7 @@ class APICompaniesController extends BaseApiController
         $offset     = $request->get('page') ? $request->get('page') : 0;
         $orderBy    = $request->get('orderBy') ? $request->get('orderBy') : 'id';
         $order      = $request->get('order') ? $request->get('order') : 'ASC';
-        $items      = $this->repository->model->with(['providers', 'providers.user'])
+        $items      = $this->repository->model->with(['company_providers', 'company_providers.provider'])
         ->orderBy($orderBy, $order)
         ->limit($perPage)
         ->offset($offset)

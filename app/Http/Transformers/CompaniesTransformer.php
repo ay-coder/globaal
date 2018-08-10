@@ -51,16 +51,14 @@ class CompaniesTransformer extends Transformer
                 $providers  = [];
                 $item       = (object)$item;
 
-                if(isset($item->providers) && count($item->providers))
+                if(isset($item->company_providers) && count($item->company_providers))
                 {
-                    foreach($item->providers as $provider)
+                    foreach($item->company_providers as $provider)
                     {
                         $providers[] = [
-                            'provider_id'           => $provider->user_id,
-                            'name'                  => $provider->user->name,
-                            'profile_pic'           => URL::to('/').'/uploads/user/' . $provider->user->profile_pic, 
-                            'level_of_experience'   => $provider->level_of_experience,
-
+                            'provider_id'           => $provider->provider_id,
+                            'name'                  => $provider->provider->name,
+                            'profile_pic'           => URL::to('/').'/uploads/user/' . $provider->provider->profile_pic, 
                         ];
                     }
                 }

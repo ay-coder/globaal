@@ -32,7 +32,8 @@ class ProvidersTransformer extends Transformer
         {
             foreach($items as $item)
             {
-                $allServices = [];
+                $allServices    = [];
+                $allCompanies   = [];
 
                 if(isset($item->services) && count($item->services))
                 {
@@ -45,6 +46,17 @@ class ProvidersTransformer extends Transformer
                     }
                 }
 
+                if(isset($item->companies) && count($item->companies))
+                {
+                    foreach($item->companies as $company)
+                    {
+                        $allCompanies[] = [
+                            'company_id'    => (int) $company->company_id,
+                            'company_name'  => isset($company->company->company_name) ? $company->company->company_name : ''
+                        ];
+                    }
+                }
+
                 $response[] = [
                     'provider_id'   => (int) $item->id,
                     'name'          => $item->user->name,
@@ -53,7 +65,8 @@ class ProvidersTransformer extends Transformer
                     'company_name'  => $this->nulltoBlank($item->company->company_name),
                     'profile_pic'   => URL::to('/').'/uploads/user/' . $item->user->profile_pic, 
                     'level_of_experience'   => $item->leavelOfExperience->level_of_experience,
-                    'services'      => $allServices
+                    'services'      => $allServices,
+                    'companies'     => $allCompanies
 
                 ];
             }
@@ -68,7 +81,8 @@ class ProvidersTransformer extends Transformer
 
         if($item)
         {
-            $allServices = [];
+            $allServices    = [];
+            $allCompanies   = [];
 
             if(isset($item->services) && count($item->services))
             {
@@ -81,6 +95,18 @@ class ProvidersTransformer extends Transformer
                 }
             }
 
+            if(isset($item->companies) && count($item->companies))
+                {
+                    foreach($item->companies as $company)
+                    {
+                        $allCompanies[] = [
+                            'company_id'    => (int) $company->company_id,
+                            'company_name'  => isset($company->company->company_name) ? $company->company->company_name : ''
+                        ];
+                    }
+                }
+
+
             $response[] = [
                 'provider_id'   => (int) $item->id,
                 'name'          => $item->user->name,
@@ -89,7 +115,8 @@ class ProvidersTransformer extends Transformer
                 'company_name'  => $this->nulltoBlank($item->company->company_name),
                 'profile_pic'   => URL::to('/').'/uploads/user/' . $item->user->profile_pic, 
                 'level_of_experience'   => $item->leavelOfExperience->level_of_experience,
-                'services'      => $allServices
+                'services'      => $allServices,
+                'companies'     => $allCompanies
             ];
         }
 
