@@ -688,7 +688,7 @@ class UsersController extends BaseApiController
         $exps       = Experiences::get();
         $providers  = ProviderTypes::get();
         $categories = MasterCategories::with('services')->get();
-        $companies = companies::get();
+        $companies  =    companies::get();
         $catResponse    = [];
         
 
@@ -718,7 +718,15 @@ class UsersController extends BaseApiController
         $expData  = [];
         $providerData = [];
         $serviceData = [];
+        $providersData = [];
 
+        foreach($providers as $provider)
+        {
+            $providersData[] = [
+                'provider_type_id'  => $provider->id,
+                'title'             => $provider->title
+            ];
+        }
         foreach($companies as $comp)
         {
             $compData[] = [
@@ -743,8 +751,8 @@ class UsersController extends BaseApiController
             'privacy_policy_url'    => 'https://www.google.co.in/',
             'company_data'          => $compData,
             'experiences_data'      => $expData,
-            'services_data'         => $catResponse
-
+            'services_data'         => $catResponse,
+            'provider_types'        => $providersData
         ];
 
         return $this->successResponse($successResponse);
