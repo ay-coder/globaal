@@ -245,7 +245,10 @@ class UsersController extends BaseApiController
     {
         $repository = new UserRepository;
         $input      = $request->all();
-        $input      = array_merge($input, ['profile_pic' => 'default.png']);
+        $input      = array_merge($input, [
+            'profile_pic'   => 'default.png'
+            'user_type'     => 1
+        ]);
         if($request->file('profile_pic'))
         {
             $imageName  = rand(11111, 99999) . '_user.' . $request->file('profile_pic')->getClientOriginalExtension();
@@ -299,7 +302,10 @@ class UsersController extends BaseApiController
     {
         $repository = new UserRepository;
         $input      = $request->all();
-        $input      = array_merge($input, ['profile_pic' => 'default.png']);
+        $input      = array_merge($input, [
+            'profile_pic' => 'default.png',
+            'user_type'     => 3
+        ]);
         if($request->file('profile_pic'))
         {
             $imageName  = rand(11111, 99999) . '_user.' . $request->file('profile_pic')->getClientOriginalExtension();
@@ -360,7 +366,10 @@ class UsersController extends BaseApiController
     {
         $repository = new UserRepository;
         $input      = $request->all();
-        $input      = array_merge($input, ['profile_pic' => 'default.png']);
+        $input      = array_merge($input, [
+            'profile_pic'   => 'default.png',
+            'user_type'     => 2
+        ]);
         if($request->file('profile_pic'))
         {
             $imageName  = rand(11111, 99999) . '_user.' . $request->file('profile_pic')->getClientOriginalExtension();
