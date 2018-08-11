@@ -39,6 +39,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'jwt.customauth'], function 
 {
     Route::post('change_password', 'UsersController@changePassword')->name('api.change-password');
     Route::post('update-password', 'UsersController@updageUserPassword')->name('api.update-user-password');
+
+    Route::post('update-profile', 'UsersController@updageUserProfile')->name('api.update-user-profile');
+
     Route::get('logout', 'UsersController@logout')->name('api.logout');
 });
 Route::group(['middleware' => 'jwt.customauth'], function () 

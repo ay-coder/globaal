@@ -590,7 +590,8 @@ class UsersController extends BaseApiController
         }
 
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'mobile'    => 'required',
+            'address'   => 'required',
         ]);
 
         if($validator->fails()) 
@@ -608,20 +609,7 @@ class UsersController extends BaseApiController
 
         if($status)
         {
-            $userObj = new User;
-
-            $user = $userObj->with('babies')->where('id', $userInfo['userId'])->first();
-
-            if($user)
-            {
-                $responseData = $this->userTransformer->updateUser($user);
-                
-                return $this->successResponse($responseData);
-            }
-
-            return $this->setStatusCode(400)->failureResponse([
-                'error' => 'User not Found !'
-            ], 'Something went wrong !');
+            return $this->successResponse(['message' => 'Profile Updated Successfully!'], 'Profile Updated Successfully');
         }
 
         return $this->setStatusCode(400)->failureResponse([
