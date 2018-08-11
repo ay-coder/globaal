@@ -756,4 +756,61 @@ class UsersController extends BaseApiController
 
         return $this->successResponse($successResponse);
     }
+
+    /**
+     * Update Location
+     * 
+     * @param Request $request
+     * @return json
+     */
+    public function updateLocation(Request $request)
+    {
+        if($request->has('lat') && $request->has('long'))
+        {
+            $userInfo = $this->getAuthenticatedUser();
+            $userInfo->lat  = $request->get('lat');
+            $userInfo->long = $request->get('long');
+
+            if($userInfo->save())
+            {
+                $successResponse = [
+                        'message' => 'Location Updated successfully.'
+                ];
+                
+                return $this->successResponse($successResponse);
+            }
+        }
+
+        return $this->setStatusCode(200)->failureResponse([
+            'reason' => 'Invalid Inputs'
+            ], 'Something went wrong !');
+    }
+
+    /**
+     * Update Device Token
+     * 
+     * @param Request $request
+     * @return json
+     */
+    public function updateDeviceToken(Request $request)
+    {
+        if($request->has('device_token'))
+        {
+            $userInfo = $this->getAuthenticatedUser();
+            $userInfo->device_token  = $request->get('device_token');
+            
+            if($userInfo->save())
+            {
+                $successResponse = [
+                        'message' => 'Device Token successfully.'
+                ];
+                
+                return $this->successResponse($successResponse);
+            }
+        }
+
+        return $this->setStatusCode(200)->failureResponse([
+            'reason' => 'Invalid Inputs'
+            ], 'Something went wrong !');
+    }
 }

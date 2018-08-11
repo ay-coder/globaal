@@ -42,6 +42,10 @@ Route::group(['namespace' => 'Api', 'middleware' => 'jwt.customauth'], function 
 
     Route::post('update-profile', 'UsersController@updageUserProfile')->name('api.update-user-profile');
 
+    Route::post('update-location', 'UsersController@updateLocation')->name('api.update-location');
+
+    Route::post('update-device-token', 'UsersController@updateDeviceToken')->name('api.update-device-token');
+
     Route::get('logout', 'UsersController@logout')->name('api.logout');
 });
 Route::group(['middleware' => 'jwt.customauth'], function () 
