@@ -81,7 +81,7 @@ class BaseApiController extends BaseController
      */
     public function setStatusCode($statusCode = 200)
     {
-        $this->statusCode = $statusCode;
+        $this->statusCode = 200;//$statusCode;
 
         return $this;
     }
