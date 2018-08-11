@@ -758,6 +758,8 @@ class UsersController extends BaseApiController
         $successResponse = [
             'support_number'        => '110001010',
             'privacy_policy_url'    => 'https://www.google.co.in/',
+            'min_distance'          => 0,
+            'max_distance'          => 10,
             'company_data'          => $compData,
             'experiences_data'      => $expData,
             'services_data'         => $catResponse,
