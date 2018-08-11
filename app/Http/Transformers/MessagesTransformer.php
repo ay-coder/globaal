@@ -44,7 +44,8 @@ class MessagesTransformer extends Transformer
                     'provider_pic'  => URL::to('/').'/uploads/user/' . $item->provider->profile_pic,
                     'patient_name'  => $item->patient->name,
                     'patient_pic'   => URL::to('/').'/uploads/user/' . $item->patient->profile_pic,
-                    'is_read'       => $isRead
+                    'is_read'       => $isRead,
+                    'created_at'    => date('Y-m-d H:i:s', strtotime($item->created_at))
                 ];
             }
         }
