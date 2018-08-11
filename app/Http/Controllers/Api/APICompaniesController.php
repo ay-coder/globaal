@@ -6,6 +6,7 @@ use App\Http\Transformers\CompaniesTransformer;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Repositories\Companies\EloquentCompaniesRepository;
 use App\Models\CompanyProviders\CompanyProviders;
+use App\Http\Transformers\ProvidersTransformer;
 
 class APICompaniesController extends BaseApiController
 {
@@ -38,6 +39,7 @@ class APICompaniesController extends BaseApiController
     {
         $this->repository                       = new EloquentCompaniesRepository();
         $this->companiesTransformer = new CompaniesTransformer();
+        $this->providersTransformer = new ProvidersTransformer();
     }
 
     /**
@@ -253,5 +255,100 @@ class APICompaniesController extends BaseApiController
         return $this->setStatusCode(400)->failureResponse([
             'message' => 'Unable to find Companies!'
             ], 'No Companies Found !');       
+    }
+
+    /**
+     * Provider Requests
+     * 
+     * @param  Request $request [description]
+     * @return json
+     */
+    public function providerRequests(Request $request)
+    {
+        $userInfo   = $this->getAuthenticatedUser();
+        $requests   = CompanyProviders::where([
+            'company_id'           => $userInfo->company->id,
+            'accept_by_company'    => 0
+        ])->with(['company', 'provider'])
+        ->orderBy('id', 'desc')
+        ->get();
+        
+
+        if($requests && count($requests))
+        {
+            $itemsOutput = $this->providersTransformer->transCompanyRequests($requests);
+
+            return $this->successResponse($itemsOutput);
+        }
+       
+        return $this->setStatusCode(400)->failureResponse([
+            'reason' => 'Invalid Inputs or No Service exists !'
+            ], 'Something went wrong !');       
+    }
+
+    /**
+     * Accept Provider Requests
+     * 
+     * @param  Request $request [description]
+     * @return json
+     */
+    public function acceptProviderRequests(Request $request)
+    {
+        if($request->has('request_id'))
+        {
+            $userInfo   = $this->getAuthenticatedUser();
+            $request    = CompanyProviders::where([
+                'company_id'            => $userInfo->company->id,
+                'id'                    => $request->get('request_id'),
+                'accept_by_company'     => 0
+            ])
+            ->first();
+        
+            if($request && count($request))
+            {   
+                $request->accept_by_company = 1;
+
+                if($request->save())
+                {
+                    return $this->successResponse(['message' => 'Accepted Request Successfully!'], 'Accepted Request Successfully');
+                }
+            }
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+            'reason' => 'Invalid Inputs or No Request exists !'
+            ], 'Something went wrong !');       
+    }
+
+    /**
+     * Reject Provider Requests
+     * 
+     * @param  Request $request [description]
+     * @return json
+     */
+    public function rejectProviderRequests(Request $request)
+    {
+        if($request->has('request_id'))
+        {
+            $userInfo   = $this->getAuthenticatedUser();
+            $request    = CompanyProviders::where([
+                'company_id'            => $userInfo->company->id,
+                'id'                    => $request->get('request_id'),
+                'accept_by_company'     => 0
+            ])
+            ->first();
+        
+            if($request && count($request))
+            {   
+                if($request->delete())
+                {
+                    return $this->successResponse(['message' => 'Rejected Request Successfully!'], 'Rejected Request Successfully');
+                }
+            }
+        }
+        
+        return $this->setStatusCode(400)->failureResponse([
+            'reason' => 'Invalid Inputs or No Request exists !'
+            ], 'Something went wrong !');       
     }
 }

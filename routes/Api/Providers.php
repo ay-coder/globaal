@@ -9,5 +9,11 @@ Route::group(['namespace' => 'Api'], function()
 
     Route::post('providers/add-service', 'APIProvidersController@addService')->name('providers.add-service');
     Route::post('providers/remove-service', 'APIProvidersController@removeService')->name('providers.remove-service');
+
+    Route::get('providers/company-requests', 'APIProvidersController@companyRequests')->name('providers.company-requests');
+
+    Route::post('providers/accept-company-requests', 'APIProvidersController@acceptCompanyRequests')->name('providers.accept-company-requests');
+
+    Route::post('providers/reject-company-requests', 'APIProvidersController@rejectCompanyRequests')->name('providers.reject-company-requests');
 });
 ?>

@@ -24,7 +24,9 @@ class CompanyProviders extends BaseModel
      *
      */
     protected $fillable = [
-        "id", "provider_id", "company_id", "created_at", "updated_at", 
+        "id", "provider_id", "company_id", 
+        "accept_by_provider", "accept_by_company",
+        "created_at", "updated_at", 
     ];
 
     /**

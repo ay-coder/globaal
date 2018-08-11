@@ -148,4 +148,32 @@ class ProvidersTransformer extends Transformer
 
         return $response;
     }
+
+    /**
+     * Trans CompanyRequests
+     * 
+     * @param array $items
+     * @return array
+     */
+    public function transCompanyRequests($items)
+    {
+        $response = [];
+
+        if($items)
+        {
+            foreach($items as $item)
+            {
+                $response[] = [
+                    'request_id'    => (int) $item->id,
+                    'provider_id'   => (int) $item->provider_id,
+                    'company_id'    => (int) $item->company_id,
+                    'company_name'  => $item->company->company_name,
+                    'provider_name' => $item->provider->name,
+                    'created_at'    => date('Y-m-d H:i:s', strtotime($item->created_at))
+                ];
+            }
+        }
+
+        return $response;
+    }
 }
