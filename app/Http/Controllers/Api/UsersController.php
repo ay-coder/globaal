@@ -506,9 +506,21 @@ class UsersController extends BaseApiController
      */
     public function changePassword(Request $request)
     {
-        if($request->get('password'))
-        {
+        if($request->has('password') && $request->has('old_password'))
+        {   
             $userInfo = $this->getAuthenticatedUser();
+            $credentials = [
+                'email'     => $userInfo->email,
+                'password'  => $request->get('old_password')
+            ];
+
+            if(! Auth::attempt($credentials))
+            {
+                return $this->setStatusCode(200)->failureResponse([
+                    'reason' => 'Invalid Old Password'
+                ], 'Invalid Old Password !');
+            }
+
             $userInfo->password = bcrypt($request->get('password'));
 
             if ($userInfo->save()) 
