@@ -25,7 +25,14 @@ class SchedulesTransformer extends Transformer
 
     public function transformProviderSchedules($items)
     {
-        $response = [];
+        $response['Sunday'] = [];
+        $response['Monday'] = [];
+        $response['Tuesday'] = [];
+        $response['Wednesday'] = [];
+        $response['Thursday'] = [];
+        $response['Friday'] = [];
+        $response['Saturday'] = [];
+        $output               = [];
 
         if($items)
         {
@@ -44,8 +51,16 @@ class SchedulesTransformer extends Transformer
                 ];
             }
 
+            foreach($response as $key => $data)
+            {
+                $output[] = [
+                    'day_name'          => $key,
+                    'schedule_array'    => $data
+                ];
+            }
+
         }
 
-        return $response;
+        return $output;
     }
 }

@@ -89,12 +89,16 @@ class APISchedulesController extends BaseApiController
             {
                 $oldSchedule = $allSchedule->where('service_id',$request->get('service_id'))
                 ->where('day_name', access()->getDay($day))
+                ->where('provider_id', $request->get('provider_id'))
+                ->where('company_id', $request->get('company_id'))
                 ->first();
 
-                if(isset($oldSchedule))
+                if(isset($oldSchedule) && isset($oldSchedule->start_time) && strlen(
+                    $oldSchedule->start_time) > 2)
                 {
+
                     $date1 = DateTime::createFromFormat('H:i:s', $oldSchedule->start_time)->format('H:i:s');
-                    $date2 = DateTime::createFromFormat('H:i', $request->get('start_time'))->format('H:i:s');
+                    $date2 = DateTime::createFromFormat('H:i', $request->get('start_time'))->format('H:i');
                     $date3 = DateTime::createFromFormat('H:i', $request->get('end_time'))->format('H:i:s');
 
                     if ($date1 >= $date2 && $date1 <= $date3)
@@ -102,13 +106,16 @@ class APISchedulesController extends BaseApiController
                        continue;
                     }
 
-                    $date4 = DateTime::createFromFormat('H:i', $oldSchedule->start_time)->format('H:i:s');
-                    $date5 = DateTime::createFromFormat('H:i', $request->get('start_time'))->format('H:i:s');
-                    $date6 = DateTime::createFromFormat('H:i', $request->get('end_time'))->format('H:i:s');
-                    
-                    if ($date4 >= $date5 && $date4 <= $date6)
+                    if(isset($oldSchedule->start_time) && strlen($oldSchedule->start_time) > 2)
                     {
-                       continue;
+                        $date4 = DateTime::createFromFormat('H:i:s', $oldSchedule->start_time)->format('H:i:s');
+                        $date5 = DateTime::createFromFormat('H:i', $request->get('start_time'))->format('H:i:s');
+                        $date6 = DateTime::createFromFormat('H:i', $request->get('end_time'))->format('H:i:s');
+                        
+                        if ($date4 >= $date5 && $date4 <= $date6)
+                        {
+                           continue;
+                        }
                     }
                 }
 
@@ -203,22 +210,27 @@ class APISchedulesController extends BaseApiController
      */
     public function delete(Request $request)
     {
-        $itemId = (int) hasher()->decode($request->get($this->primaryKey));
-
-        if($itemId)
+        if($request->has('schedule_id') && $request->has('company_id') && $request->has('provider_id'))
         {
-            $status = $this->repository->destroy($itemId);
+            $model = $this->repository->model->where([
+                'id'            => $request->get('schedule_id'),
+                'provider_id'   => $request->get('provider_id'),
+                'company_id'    => $request->get('company_id'),
+            ])->first();
 
-            if($status)
+            if(isset($model) && isset($model->id))
             {
-                return $this->successResponse([
-                    'success' => 'Schedules Deleted'
-                ], 'Schedules is Deleted Successfully');
+                if($model->delete())
+                {
+                    return $this->successResponse([
+                        'success' => 'Schedules Deleted'
+                    ], 'Schedules is Deleted Successfully');
+                }
             }
         }
-
+       
         return $this->setStatusCode(404)->failureResponse([
-            'reason' => 'Invalid Inputs'
-        ], 'Something went wrong !');
+            'reason' => 'Invalid Inputs or Schedule Not Found !'
+        ], 'Invalid Inputs or Schedule Not Found !');
     }
 }
