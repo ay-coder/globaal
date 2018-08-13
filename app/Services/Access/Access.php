@@ -161,4 +161,25 @@ class Access
     {
        return 0;
     }
+
+    /**
+     * GetDay
+     * 
+     * @param  integer $day [description]
+     * @return [type]       [description]
+     */
+    public function getDay($day = 0)
+    {
+        $days = [
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+            'Sunday',
+        ];
+
+        return $days[$day];
+    }
 }
