@@ -37,6 +37,7 @@ class SchedulesTransformer extends Transformer
                     'service_id'    => (int) $item->service_id,
                     'company_id'    => (int) $item->company_id,
                     'provider_name' => $item->provider->user->name,
+                    'company_name'  => $item->company->company_name,
                     'service'       => $item->service->title,
                     'start_time'    => $item->start_time,
                     'end_time'      => $item->end_time,
