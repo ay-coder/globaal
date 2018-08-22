@@ -3,6 +3,7 @@
 use App\Models\Access\User\User;
 use App\Models\Providers\Providers;
 use App\Models\CompanyProviders\CompanyProviders;
+use App\Models\Services\Services;
 
 trait Relationship
 {
@@ -24,5 +25,15 @@ trait Relationship
 	public function company_providers()
 	{
 		return $this->hasMany(CompanyProviders::class, 'company_id');	
+	}
+
+	/**
+	 * Services
+	 * 
+	 * @return  \Illuminate\Database\Eloquent\Relations\HasMany
+	 */
+	public function company_services()
+	{
+		return $this->hasMany(Services::class, 'company_id');	
 	}
 }

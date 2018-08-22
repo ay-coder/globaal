@@ -29,6 +29,7 @@ use App\Models\Services\Services;
 use App\Models\Experiences\Experiences;
 use App\Models\ProviderTypes\ProviderTypes;
 use App\Models\MasterCategories\MasterCategories;
+use App\Models\CompanyServices\CompanyServices;
 
 class UsersController extends BaseApiController
 {
@@ -342,11 +343,28 @@ class UsersController extends BaseApiController
             $user           = Auth::user()->toArray();
             $companydata    = [
                 'user_id'       => $user['id'],
-                'company_name'  => $request->get('company_name'),
+                'company_name'  => $request->get('name'),
                 'start_time'    => $request->get('start_time'),
                 'end_time'      => $request->get('end_time'),
             ];
             $company        = Companies::create($companydata);
+
+            if($request->get('services'))
+            {
+                $services       = explode(',', $request->get('services'));
+                $serviceData    = [];
+
+                foreach($services as $service)
+                {
+                    $serviceData[] = [
+                        'company_id'    => $company->id,
+                        'service_id'    => $service
+                    ];
+                }
+
+                CompanyServices::insert($serviceData);
+            }
+
             $userData       = array_merge($user, $companydata, ['token' => $token]);  
             $responseData   = $this->userTransformer->companyTranform((object)$userData);
             return $this->successResponse($responseData);
@@ -758,6 +776,8 @@ class UsersController extends BaseApiController
         $successResponse = [
             'support_number'        => '110001010',
             'privacy_policy_url'    => 'https://www.google.co.in/',
+            'terms_conditions_url'  => 'https://www.google.co.in/',
+            'about_us_url'          => 'https://www.google.co.in/',
             'min_distance'          => 0,
             'max_distance'          => 10,
             'company_data'          => $compData,
