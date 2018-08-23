@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use App\Http\Transformers\CompanyServicesTransformer;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Repositories\CompanyServices\EloquentCompanyServicesRepository;
+use App\Models\Companies\Companies;
+use App\Models\Services\Services;
 
 class APICompanyServicesController extends BaseApiController
 {
@@ -47,21 +49,48 @@ class APICompanyServicesController extends BaseApiController
      */
     public function index(Request $request)
     {
-        $paginate   = $request->get('paginate') ? $request->get('paginate') : false;
-        $orderBy    = $request->get('orderBy') ? $request->get('orderBy') : 'id';
-        $order      = $request->get('order') ? $request->get('order') : 'ASC';
-        $items      = $paginate ? $this->repository->model->orderBy($orderBy, $order)->paginate($paginate)->items() : $this->repository->getAll($orderBy, $order);
+        if($request->has('company_id'))
+        {  
+            $allServices    = Services::pluck('title', 'id')->toArray();
+            $company        = Companies::where('id', $request->get('company_id'))
+                ->with(['company_services'])->first();
 
-        if(isset($items) && count($items))
-        {
-            $itemsOutput = $this->companyservicesTransformer->transformCollection($items);
+            if(isset($company))
+            {
+                $itemsOutput = $this->companyservicesTransformer->transformCompanyWithServices($company, $allServices);
 
-            return $this->successResponse($itemsOutput);
+                return $this->successResponse($itemsOutput);
+            }
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+            'message' => 'Unable to find Services!'
+            ], 'No Services Found !');
+    }
+
+    /**
+     * Search 
+     * 
+     * @param Request $request
+     * @return array
+     */
+    public function search(Request $request)
+    {
+       if($request->has('company_id'))
+        {  
+            $companyServices = $this->repository->model->where([
+                'company_id'=> $request->get('company_id')
+            ])->pluck('service_id')->toArray();
+
+            $allServices    = Services::get();
+            $itemsOutput    = $this->companyservicesTransformer->transformSearchCompanyWithServices($companyServices, $allServices);
+
+                return $this->successResponse($itemsOutput);
         }
 
         return $this->setStatusCode(400)->failureResponse([
             'message' => 'Unable to find CompanyServices!'
-            ], 'No CompanyServices Found !');
+            ], 'No CompanyServices Found !'); 
     }
 
     /**
@@ -72,15 +101,35 @@ class APICompanyServicesController extends BaseApiController
      */
     public function create(Request $request)
     {
-        $model = $this->repository->create($request->all());
-
-        if($model)
+        if($request->has('company_id') && $request->has('service_id'))
         {
-            $responseData = $this->companyservicesTransformer->transform($model);
+            $isExist = $this->repository->model->where([
+                'company_id' => $request->get('company_id'),
+                'service_id' => $request->get('service_id'),
+            ])->count();
 
-            return $this->successResponse($responseData, 'CompanyServices is Created Successfully');
+            if(isset($isExist) && $isExist > 0)
+            {
+                return $this->setStatusCode(400)->failureResponse([
+                    'reason' => 'Service Already Added !'
+                ], 'Service Already Added!');
+            }
+
+            $status = $this->repository->model->create([
+                'company_id' => $request->get('company_id'),
+                'service_id' => $request->get('service_id')
+            ]);
+
+            if($status)
+            {
+                $responseData = [
+                    'message' => 'Service Added successfully'
+                ];
+                
+                return $this->successResponse($responseData, 'Service Added successfully');
+            }
         }
-
+        
         return $this->setStatusCode(400)->failureResponse([
             'reason' => 'Invalid Inputs'
             ], 'Something went wrong !');
@@ -167,4 +216,47 @@ class APICompanyServicesController extends BaseApiController
             'reason' => 'Invalid Inputs'
         ], 'Something went wrong !');
     }
+
+    /**
+     * Remove
+     *
+     * @param Request $request
+     * @return string
+     */
+    public function remove(Request $request)
+    {
+        if($request->has('company_id') && $request->has('service_id'))
+        {
+            $isExist = $this->repository->model->where([
+                'company_id' => $request->get('company_id'),
+                'service_id' => $request->get('service_id'),
+            ])->count();
+
+
+            if(isset($isExist) && $isExist == 0)
+            {
+                return $this->setStatusCode(400)->failureResponse([
+                    'reason' => 'No Service Found !'
+                ], 'No Service Found!');
+            }
+
+            $status = $this->repository->model->where([
+                'company_id' => $request->get('company_id'),
+                'service_id' => $request->get('service_id')
+            ])->delete();
+
+            if($status)
+            {
+                $responseData = [
+                    'message' => 'Service Removed successfully'
+                ];
+                
+                return $this->successResponse($responseData, 'Service Removed successfully');
+            }
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+            'reason' => 'Invalid Inputs'
+            ], 'Something went wrong !');
+    }   
 }

@@ -4,6 +4,7 @@ use App\Models\Access\User\User;
 use App\Models\Providers\Providers;
 use App\Models\CompanyProviders\CompanyProviders;
 use App\Models\Services\Services;
+use App\Models\CompanyServices\CompanyServices;
 
 trait Relationship
 {
@@ -34,6 +35,6 @@ trait Relationship
 	 */
 	public function company_services()
 	{
-		return $this->hasMany(Services::class, 'company_id');	
+		return $this->hasMany(CompanyServices::class, 'company_id');	
 	}
 }
