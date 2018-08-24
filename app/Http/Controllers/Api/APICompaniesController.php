@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\BaseApiController;
 use App\Repositories\Companies\EloquentCompaniesRepository;
 use App\Models\CompanyProviders\CompanyProviders;
 use App\Http\Transformers\ProvidersTransformer;
+use App\Models\Access\User\User;
+use App\Models\Providers\Providers;
 
 class APICompaniesController extends BaseApiController
 {
@@ -123,18 +125,20 @@ class APICompaniesController extends BaseApiController
      */
     public function show(Request $request)
     {
-        $itemId = (int) hasher()->decode($request->get($this->primaryKey));
-
-        if($itemId)
+        if($request->has('company_id'))
         {
-            $itemData = $this->repository->getById($itemId);
+            $companyId      = $request->get('company_id');
+            $companyUser    = User::where('id', $companyId)->first();
+            /*$company        = $this->repository->model->with(['company_providers', 'company_services', 'company_testimonials'])->where()->first();*/
 
-            if($itemData)
-            {
-                $responseData = $this->companiesTransformer->transform($itemData);
 
-                return $this->successResponse($responseData, 'View Item');
-            }
+            $companyInfo      = $this->repository->model->with(['company_providers', 'company_providers.provider', 'company_services', 'company_testimonials', 'company_services', 'company_services.service'])
+            ->where('user_id', $companyUser->id)
+            ->first();
+
+            $responseData = $this->companiesTransformer->singleCompanyTransform($companyInfo);
+
+            return $this->successResponse($responseData);
         }
 
         return $this->setStatusCode(400)->failureResponse([
