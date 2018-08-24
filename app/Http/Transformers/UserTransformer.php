@@ -87,10 +87,13 @@ class UserTransformer extends Transformer
         {
             foreach($companies as $company)
             {
-                $providerCompanies[] = [
-                    'company_id'        => (int) $company->company->id,
-                    'company_name'      => $company->company->company_name
-                ];
+                if(isset($company->company))
+                {
+                    $providerCompanies[] = [
+                        'company_id'        => (int) $company->company->id,
+                        'company_name'      => $company->company->company_name
+                    ];
+                }
             }
         }
 
