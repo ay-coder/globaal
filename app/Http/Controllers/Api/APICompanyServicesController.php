@@ -52,7 +52,7 @@ class APICompanyServicesController extends BaseApiController
         if($request->has('company_id'))
         {  
             $allServices    = Services::pluck('title', 'id')->toArray();
-            $company        = Companies::where('id', $request->get('company_id'))
+            $company        = Companies::where('user_id', $request->get('company_id'))
                 ->with(['company_services'])->first();
 
             if(isset($company))
