@@ -24,7 +24,7 @@ class CompanyServices extends BaseModel
      *
      */
     protected $fillable = [
-        "id", "company_id", "service_id", "status", "created_at", "updated_at", 
+        "id", "company_id", "user_id", "service_id", "status", "created_at", "updated_at", 
     ];
 
     /**

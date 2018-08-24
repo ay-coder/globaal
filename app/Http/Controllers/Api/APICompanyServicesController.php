@@ -104,8 +104,10 @@ class APICompanyServicesController extends BaseApiController
     {
         if($request->has('company_id') && $request->has('service_id'))
         {
+            $userInfo   = $this->getAuthenticatedUser();
             $isExist = $this->repository->model->where([
                 'company_id' => $request->get('company_id'),
+                'user_id'    => $userInfo->id,
                 'service_id' => $request->get('service_id'),
             ])->count();
 
@@ -228,9 +230,10 @@ class APICompanyServicesController extends BaseApiController
     {
         if($request->has('company_id') && $request->has('service_id'))
         {
-            $isExist = $this->repository->model->where([
-                'company_id' => $request->get('company_id'),
-                'service_id' => $request->get('service_id'),
+            $userInfo   = $this->getAuthenticatedUser();
+            $isExist    = $this->repository->model->where([
+                'user_id'       => $userInfo->id,
+                'service_id'    => $request->get('service_id'),
             ])->count();
 
 
@@ -242,8 +245,8 @@ class APICompanyServicesController extends BaseApiController
             }
 
             $status = $this->repository->model->where([
-                'company_id' => $request->get('company_id'),
-                'service_id' => $request->get('service_id')
+                'user_id'       => $userInfo->id,
+                'service_id'    => $request->get('service_id')
             ])->delete();
 
             if($status)
