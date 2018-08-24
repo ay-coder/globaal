@@ -728,13 +728,13 @@ class UsersController extends BaseApiController
                 foreach($item->services as $service)
                 {
                     $services[] = [
-                        'id'    => $service->id,
+                        'id'    => (int) $service->id,
                         'title' => $service->title
                     ];
                 }
             }
             $catResponse[] = [
-                'id'            => $item->id,
+                'id'            => (int) $item->id,
                 'title'         => $item->title,
                 'description'   => $item->description,
                 'services'      => $services
@@ -750,14 +750,14 @@ class UsersController extends BaseApiController
         foreach($providers as $provider)
         {
             $providersData[] = [
-                'provider_type_id'  => $provider->id,
+                'provider_type_id'  => (int) $provider->id,
                 'title'             => $provider->title
             ];
         }
         foreach($companies as $comp)
         {
             $compData[] = [
-                'id'            => $comp->id,
+                'id'            => (int) $comp->id,
                 'company_name'  => $comp->company_name,
                 'start_time'    => $comp->start_time,
                 'end_time'      => $comp->end_time,
