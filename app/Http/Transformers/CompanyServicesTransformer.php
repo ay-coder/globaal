@@ -29,23 +29,20 @@ class CompanyServicesTransformer extends Transformer
      * @param object $company 
      * @return array
      */
-    public function transformCompanyWithServices($company, $services)
+    public function transformCompanyWithServices($companyServices, $services)
     {
         $response = [];
 
-        if(isset($company))
+        if(isset($companyServices))
         {
-            if(isset($company->company_services) && count($company->company_services))   
+            foreach($companyServices as $service)
             {
-                foreach($company->company_services as $service)
+                if(isset($services[$service->service_id]))
                 {
-                    if(isset($services[$service->service_id]))
-                    {
-                        $response[] = [
-                            'id'    => (int) $service->service_id,
-                            'title' => $services[$service->service_id]
-                        ];
-                    }
+                    $response[] = [
+                        'id'    => (int) $service->service_id,
+                        'title' => $services[$service->service_id]
+                    ];
                 }
             }
         }

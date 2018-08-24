@@ -52,12 +52,13 @@ class APICompanyServicesController extends BaseApiController
         if($request->has('company_id'))
         {  
             $allServices    = Services::pluck('title', 'id')->toArray();
-            $company        = Companies::where('user_id', $request->get('company_id'))
-                ->with(['company_services'])->first();
+            $company        = Companies::where('user_id', $request->get('company_id'))->first();
 
-            if(isset($company))
+            $companyServices = $this->repository->model->where('company_id', $company->user_id)->get();
+
+            if(isset($companyServices))
             {
-                $itemsOutput = $this->companyservicesTransformer->transformCompanyWithServices($company, $allServices);
+                $itemsOutput = $this->companyservicesTransformer->transformCompanyWithServices($companyServices, $allServices);
 
                 return $this->successResponse($itemsOutput);
             }
