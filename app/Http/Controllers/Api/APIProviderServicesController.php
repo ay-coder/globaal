@@ -5,6 +5,9 @@ use Illuminate\Http\Request;
 use App\Http\Transformers\ProviderServicesTransformer;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Repositories\ProviderServices\EloquentProviderServicesRepository;
+use App\Models\Providers\Providers;
+use App\Models\Services\Services;
+use App\Models\ProviderServices\ProviderServices;
 
 class APIProviderServicesController extends BaseApiController
 {
@@ -47,15 +50,40 @@ class APIProviderServicesController extends BaseApiController
      */
     public function index(Request $request)
     {
-        $paginate   = $request->get('paginate') ? $request->get('paginate') : false;
-        $orderBy    = $request->get('orderBy') ? $request->get('orderBy') : 'id';
-        $order      = $request->get('order') ? $request->get('order') : 'ASC';
-        $items      = $paginate ? $this->repository->model->orderBy($orderBy, $order)->paginate($paginate)->items() : $this->repository->getAll($orderBy, $order);
-
-        if(isset($items) && count($items))
+        $userInfo   = $this->getAuthenticatedUser();
+        $providerId = $request->has('provider_id') ?  $request->get('provider_id') : $userInfo->id;
+        $provider   = Providers::with(['services'])->where('user_id', $providerId)->first();
+        $services   = Services::getAll()->toArray();
+       
+        if(isset($provider) && count($provider))
         {
-            $itemsOutput = $this->providerservicesTransformer->transformCollection($items);
+            $itemsOutput = $this->providerservicesTransformer->transformProviderWithServices($provider, $services);
 
+            return $this->successResponse($itemsOutput);
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+            'message' => 'Unable to find ProviderServices!'
+            ], 'No ProviderServices Found !');
+    }
+
+    /**
+     * List of All ProviderServices
+     *
+     * @param Request $request
+     * @return json
+     */
+    public function search(Request $request)
+    {
+        $userInfo   = $this->getAuthenticatedUser();
+        $providerId = $request->has('provider_id') ?  $request->get('provider_id') : $userInfo->id;
+        $serviceIds = ProviderServices::where('provider_id', $providerId)-> pluck('service_id')->toArray();
+        $services   = Services::getAll();
+       
+        if(isset($services) && count($services))
+        {
+            $itemsOutput = $this->providerservicesTransformer->transformProviderSearchServices($serviceIds, $services);
+            
             return $this->successResponse($itemsOutput);
         }
 
@@ -72,13 +100,34 @@ class APIProviderServicesController extends BaseApiController
      */
     public function create(Request $request)
     {
-        $model = $this->repository->create($request->all());
-
-        if($model)
+        if($request->has('service_id'))
         {
-            $responseData = $this->providerservicesTransformer->transform($model);
+            $userInfo   = $this->getAuthenticatedUser();
+            $providerId = $request->has('provider_id') ?  $request->get('provider_id') : $userInfo->id;
+            $isExist    = ProviderServices::where([
+                'provider_id'   => $providerId,
+                'service_id'    => $request->get('service_id')
+            ])->count();
 
-            return $this->successResponse($responseData, 'ProviderServices is Created Successfully');
+            if(isset($isExist) && $isExist > 0)
+            {
+                return $this->setStatusCode(400)->failureResponse([
+                    'reason' => 'Service Already Exists !'
+                    ], 'Service Already Exists !');
+            }
+
+            $status = ProviderServices::create([
+                'provider_id'   => $providerId,
+                'service_id'    => $request->get('service_id')
+            ]);
+            
+            if($status)
+            {
+                $message = [
+                    'message' => 'Service added Successfully'
+                ];
+                return $this->successResponse($message, 'ProviderServices is Created Successfully');
+            }
         }
 
         return $this->setStatusCode(400)->failureResponse([
@@ -149,22 +198,33 @@ class APIProviderServicesController extends BaseApiController
      */
     public function delete(Request $request)
     {
-        $itemId = (int) hasher()->decode($request->get($this->primaryKey));
-
-        if($itemId)
+        if($request->has('service_id'))
         {
-            $status = $this->repository->destroy($itemId);
+            $userInfo   = $this->getAuthenticatedUser();
+            $providerId = $request->has('provider_id') ?  $request->get('provider_id') : $userInfo->id;
+            $isExist    = ProviderServices::where([
+                'provider_id'   => $providerId,
+                'service_id'    => $request->get('service_id')
+            ])->first();
 
-            if($status)
+            if(isset($isExist->id))
             {
-                return $this->successResponse([
-                    'success' => 'ProviderServices Deleted'
-                ], 'ProviderServices is Deleted Successfully');
+                if($isExist->delete())
+                {
+                    $message = [
+                        'message' => 'Service removed Successfully'
+                    ];
+                    return $this->successResponse($message, 'Provider Services is removed Successfully');   
+                }
             }
+
+            return $this->setStatusCode(400)->failureResponse([
+                    'reason' => 'No Service Exists !'
+                    ], 'No Service Exists !');
         }
 
-        return $this->setStatusCode(404)->failureResponse([
+        return $this->setStatusCode(400)->failureResponse([
             'reason' => 'Invalid Inputs'
-        ], 'Something went wrong !');
+            ], 'Something went wrong !');
     }
 }

@@ -130,4 +130,29 @@ class CompaniesTransformer extends Transformer
 
         return $response; 
     }
+
+    public function companyTranformWithDistance($companies, $allCompanies = array())
+    {
+        $response = [];
+
+        if(isset($companies))   
+        {
+            foreach($companies as $item)
+            {
+                $company = $allCompanies->where('user_id', $item->id)->first();
+                if(isset($company->id))
+                {
+                    $response[] = [
+                        "company_id"    => (int) $item->id,
+                        "company_name"  =>  $company->company_name,
+                        "start_time"    =>  $company->start_time,
+                        "end_time"      =>  $company->end_time,
+                        'distance'      => (float) number_format($item->distance, 3)
+                    ];
+                }
+            }
+        }
+
+        return $response;
+    }
 }

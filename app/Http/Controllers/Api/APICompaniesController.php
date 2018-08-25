@@ -9,6 +9,7 @@ use App\Models\CompanyProviders\CompanyProviders;
 use App\Http\Transformers\ProvidersTransformer;
 use App\Models\Access\User\User;
 use App\Models\Providers\Providers;
+use DB;
 
 class APICompaniesController extends BaseApiController
 {
@@ -67,6 +68,29 @@ class APICompaniesController extends BaseApiController
         return $this->setStatusCode(400)->failureResponse([
             'message' => 'Unable to find Companies!'
             ], 'No Companies Found !');
+    }
+
+    public function getCompaniesWithDistances(Request $request)
+    {
+        $userInfo   = $this->getAuthenticatedUser();
+        $companies   = DB::select("SELECT *, ( 6371 * acos( cos( radians($userInfo->lat) ) * cos( radians( `lat` ) ) * cos( radians( `long` ) - radians($userInfo->long) ) + sin( radians($userInfo->lat) ) * sin( radians( `lat` ) ) ) ) AS distance
+        FROM users
+        where user_type = 3
+        AND users.id != $userInfo->id
+        ORDER BY distance ASC");
+        
+        $allCompanies = $this->repository->model->getAll();
+        
+        if(isset($companies) && count($companies))
+        {
+            $itemsOutput = $this->companiesTransformer->companyTranformWithDistance($companies, $allCompanies);
+
+            return $this->successResponse($itemsOutput);
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+         'message' => 'Unable to find Companies!'
+        ], 'No Companies Found !');
     }
 
     /**

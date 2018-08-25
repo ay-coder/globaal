@@ -65,6 +65,7 @@ class TestimonialsTransformer extends Transformer
             foreach($items as $item)
             {
                 $response[] = [
+                    'testimonial_id' => (int) $item->id,
                     'user_id'       => (int) $item->user_id,
                     'name'          => $item->user->name,
                     'email'         => $item->user->email,
@@ -101,6 +102,7 @@ class TestimonialsTransformer extends Transformer
             foreach($items as $item)
             {
                 $response[] = [
+                    'testimonial_id' => (int) $item->id,
                     'user_id'       => (int) $item->user_id,
                     'name'          => $item->user->name,
                     'email'         => $item->user->email,

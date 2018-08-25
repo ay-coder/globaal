@@ -17,6 +17,9 @@ Route::group(['namespace' => 'Api'], function()
 
     Route::post('companies/reject-company-requests', 'APICompaniesController@rejectProviderRequests')->name('companies.reject-provider-requests');
 
+    Route::get('companies-with-distance', 'APICompaniesController@getCompaniesWithDistances')->name('companies.companies');
+
+
     /*Route::post('companies/add-provider', 'APICompaniesController@addProvider')->name('companies.add-provider');
     Route::post('companies/remove-provider', 'APICompaniesController@removeProvider')->name('companies.remove-provider');*/
 });
