@@ -168,7 +168,9 @@ class ProvidersTransformer extends Transformer
                     'provider_id'   => (int) $item->provider_id,
                     'company_id'    => (int) $item->company_id,
                     'company_name'  => $item->company->company_name,
+                    'company_image' =>  URL::to('/').'/uploads/user/' . $item->company->user->profile_pic,
                     'provider_name' => $item->provider->name,
+                    'provider_image' =>  URL::to('/').'/uploads/user/' . $item->provider->profile_pic,
                     'created_at'    => date('Y-m-d H:i:s', strtotime($item->created_at))
                 ];
             }
