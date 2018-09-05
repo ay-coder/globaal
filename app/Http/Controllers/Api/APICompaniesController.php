@@ -160,9 +160,12 @@ class APICompaniesController extends BaseApiController
             ->where('user_id', $companyUser->id)
             ->first();
 
-            $responseData = $this->companiesTransformer->singleCompanyTransform($companyInfo);
+            if(isset($companyInfo))
+            {
+                $responseData = $this->companiesTransformer->singleCompanyTransform($companyInfo);
 
-            return $this->successResponse($responseData);
+                return $this->successResponse($responseData);
+            }
         }
 
         return $this->setStatusCode(400)->failureResponse([
