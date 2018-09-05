@@ -47,32 +47,41 @@ class CompaniesTransformer extends Transformer
         $testimonials   = [];
         $services       = [];
 
-        foreach($companyInfo->company_providers as $provider)
+        if(isset($companyInfo->company_providers))
         {
-            $providers[] = [
-                'provider_id'           => (int) $provider->provider_id,
-                'name'                  => $provider->provider->name,
-                'profile_pic'           => URL::to('/').'/uploads/user/' . $provider->provider->profile_pic, 
-            ];
+            foreach($companyInfo->company_providers as $provider)
+            {
+                $providers[] = [
+                    'provider_id'           => (int) $provider->provider_id,
+                    'name'                  => $provider->provider->name,
+                    'profile_pic'           => URL::to('/').'/uploads/user/' . $provider->provider->profile_pic, 
+                ];
+            }
         }
 
-        foreach($companyInfo->company_services as $service)
+        if(isset($companyInfo->company_services))
         {
-            $services[] = [
-                'service_id'    => (int) $service->id,
-                'title'         => $service->service->title
-            ];
+            foreach($companyInfo->company_services as $service)
+            {
+                $services[] = [
+                    'service_id'    => (int) $service->id,
+                    'title'         => $service->service->title
+                ];
+            }
         }
 
-        foreach($companyInfo->company_testimonials as $testimonial)
+        if(isset($companyInfo->company_testimonials))
         {
-            $testimonials[] = [
-                'testimonial_id'=> (int) $testimonial->id,
-                'title'         => $testimonial->title,
-                'description'   => $testimonial->description,
-                'before_image'  =>  URL::to('/').'/uploads/testimonials/'.$testimonial->before_image,
-                'after_image'   =>  URL::to('/').'/uploads/testimonials/'.$testimonial->after_image,
-            ];
+            foreach($companyInfo->company_testimonials as $testimonial)
+            {
+                $testimonials[] = [
+                    'testimonial_id'=> (int) $testimonial->id,
+                    'title'         => $testimonial->title,
+                    'description'   => $testimonial->description,
+                    'before_image'  =>  URL::to('/').'/uploads/testimonials/'.$testimonial->before_image,
+                    'after_image'   =>  URL::to('/').'/uploads/testimonials/'.$testimonial->after_image,
+                ];
+            }
         }
 
            
