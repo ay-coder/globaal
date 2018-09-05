@@ -131,6 +131,32 @@ class CompaniesTransformer extends Transformer
         return $response; 
     }
 
+    public function singleCompanyTranformWithProviders($items)
+    {
+        $response = [];
+
+       
+        if(isset($item->company_providers) && count($item->company_providers))
+        {
+            foreach($item->company_providers as $provider)
+            {
+                $providers[] = [
+                    'provider_id'           => $provider->provider_id,
+                    'name'                  => $provider->provider->name,
+                    'profile_pic'           => URL::to('/').'/uploads/user/' . $provider->provider->profile_pic, 
+                ];
+            }
+        }
+                
+        return [
+            "company_id"    => (int) $item->id,
+            "company_name"  =>  $this->nulltoBlank($item->company_name),
+            "start_time"    =>  $this->nulltoBlank($item->start_time),
+            "end_time"      =>  $this->nulltoBlank($item->end_time),
+            'providers'     => $providers
+        ];
+    }
+
     public function companyTranformWithDistance($companies, $allCompanies = array())
     {
         $response = [];

@@ -256,6 +256,33 @@ class APICompaniesController extends BaseApiController
     }
 
     /**
+     * Get Company Providers
+     * 
+     * @param Request $request
+     * @return json
+     */
+    public function getCompanyProviders(Request $request)
+    {
+        if($request->has('company_id'))
+        {
+            $item      = $this->repository->model->with(['company_providers', 'company_providers.provider'])
+            ->where('id', $request->get('company_id'))
+            ->get();
+
+            if(isset($item) && count($item))
+            {
+                $itemsOutput = $this->companiesTransformer->companyTranformWithProviders($item);
+
+                return $this->successResponse($itemsOutput);
+            }
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+            'message' => 'Unable to find Companies!'
+            ], 'No Companies Found !');       
+    }
+
+    /**
      * Add Provider
      * 
      * @param Request $request
