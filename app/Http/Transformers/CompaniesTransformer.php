@@ -64,7 +64,7 @@ class CompaniesTransformer extends Transformer
             foreach($companyInfo->company_services as $service)
             {
                 $services[] = [
-                    'service_id'    => (int) $service->id,
+                    'service_id'    => (int) $service->service->id,
                     'title'         => $service->service->title
                 ];
             }
