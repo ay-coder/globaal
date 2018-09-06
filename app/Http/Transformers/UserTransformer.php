@@ -14,8 +14,8 @@ class UserTransformer extends Transformer
 
         return [
             'user_id'               => (int) $data->id,
-            'provider_id'           => $providerId,
-            'company_id'            => $companyId,
+            'provider_id'           => (int) $providerId,
+            'company_id'            => (int) $companyId,
             'user_token'            => $this->nulltoBlank($data->token),
             'email'                 => $this->nulltoBlank($data->email),
             'user_type'             => isset($data->user_type) ? (int) $data->user_type : 0,
@@ -44,8 +44,8 @@ class UserTransformer extends Transformer
 
         return [
             'user_id'               => (int) $data->id,
-            'provider_id'           => $providerId,
-            'company_id'            => $companyId,
+            'provider_id'           => (int) $providerId,
+            'company_id'            => (int) $companyId,
             'user_token'            => $this->nulltoBlank($data->token),
             'email'                 => $this->nulltoBlank($data->email),
             'user_type'             => isset($data->user_type) ? (int) $data->user_type : 0,
@@ -112,8 +112,8 @@ class UserTransformer extends Transformer
         
         return [
             'user_id'               => (int) $data->id,
-            'provider_id'           => $providerId,
-            'company_id'            => $companyId,
+            'provider_id'           => (int) $providerId,
+            'company_id'            => (int) $companyId,
             'user_token'            => $this->nulltoBlank($data->token),
             'email'                 => $this->nulltoBlank($data->email),
             'user_type'             => isset($data->user_type) ? (int) $data->user_type : 0,
