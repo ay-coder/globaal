@@ -86,7 +86,7 @@ class CompaniesTransformer extends Transformer
 
            
             $response = [
-                "company_id"    => (int) $companyInfo->user->id,
+                "company_id"    => (int) $companyInfo->id,
                 "company_name"  =>  $this->nulltoBlank($companyInfo->company_name),
                 "start_time"    =>  $this->nulltoBlank($companyInfo->start_time),
                 "end_time"      =>  $this->nulltoBlank($companyInfo->end_time),
