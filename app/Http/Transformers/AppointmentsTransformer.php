@@ -37,7 +37,7 @@ class AppointmentsTransformer extends Transformer
                     'user_id'           => (int) $item->user_id,
                     'company_id'        => (int) $item->company_id,
                     'service_id'        => (int) $item->service_id,
-                    'service_title'     => $item->service->title,
+                    'service_title'     => isset($item->service) ? $item->service->title : '',
                     'provider_id'       => (int) $item->provider_id,
                     'provider_name'     => $item->provider->name,
                     'provider_pic'      => URL::to('/').'/uploads/user/' . $item->provider->profile_pic, 

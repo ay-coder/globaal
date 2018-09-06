@@ -11,7 +11,9 @@ Route::group(['namespace' => 'Api'], function()
 
     Route::post('get_companies_providers', 'APICompaniesController@getAllProviders')->name('companies.get-all-providers');
 
-     Route::post('company/providers', 'APICompaniesController@getCompanyProviders')->name('companies.company-providers');
+    Route::post('company/providers', 'APICompaniesController@getCompanyProviders')->name('companies.company-providers');
+
+    Route::post('company/search-providers', 'APICompaniesController@searchProviders')->name('companies.search-providers');
 
     Route::get('companies/provider-requests', 'APICompaniesController@providerRequests')->name('companies.provider-requests');
 

@@ -3,6 +3,8 @@
 namespace App\Services\Access;
 
 use Illuminate\Contracts\Auth\Authenticatable;
+use App\Models\Providers\Providers;
+use App\Models\Companies\Companies;
 
 /**
  * Class Access.
@@ -181,5 +183,47 @@ class Access
         ];
 
         return $days[$day];
+    }
+
+    /**
+     * Get ProviderId
+     * 
+     * @param int $userId
+     * @return int
+     */
+    public function getCompanyId($userId)
+    {
+        if($userId)
+        {
+            $company = Companies::where('user_id', $userId)->first();
+
+            if(isset($company) && isset($company->id))
+            {
+                return $company->id;
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Get ProviderId
+     * 
+     * @param int $userId
+     * @return int
+     */
+    public function getProviderId($userId)
+    {
+        if($userId)
+        {
+            $provider = Providers::where('user_id', $userId)->first();
+
+            if(isset($provider) && isset($provider->id))
+            {
+                return $provider->id;
+            }
+        }
+
+        return '';
     }
 }

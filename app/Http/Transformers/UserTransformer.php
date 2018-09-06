@@ -9,8 +9,13 @@ class UserTransformer extends Transformer
 {
     public function transform($data) 
     {
+        $providerId = access()->getProviderId($data->id);
+        $companyId  = access()->getCompanyId($data->id);
+
         return [
             'user_id'               => (int) $data->id,
+            'provider_id'           => $providerId,
+            'company_id'            => $companyId,
             'user_token'            => $this->nulltoBlank($data->token),
             'email'                 => $this->nulltoBlank($data->email),
             'user_type'             => isset($data->user_type) ? (int) $data->user_type : 0,
@@ -34,8 +39,13 @@ class UserTransformer extends Transformer
 
     public function companyTranform($data) 
     {
+        $providerId = access()->getProviderId($data->id);
+        $companyId  = access()->getCompanyId($data->id);
+
         return [
             'user_id'               => (int) $data->id,
+            'provider_id'           => $providerId,
+            'company_id'            => $companyId,
             'user_token'            => $this->nulltoBlank($data->token),
             'email'                 => $this->nulltoBlank($data->email),
             'user_type'             => isset($data->user_type) ? (int) $data->user_type : 0,
@@ -97,8 +107,13 @@ class UserTransformer extends Transformer
             }
         }
 
+        $providerId = access()->getProviderId($data->id);
+        $companyId  = access()->getCompanyId($data->id);
+        
         return [
             'user_id'               => (int) $data->id,
+            'provider_id'           => $providerId,
+            'company_id'            => $companyId,
             'user_token'            => $this->nulltoBlank($data->token),
             'email'                 => $this->nulltoBlank($data->email),
             'user_type'             => isset($data->user_type) ? (int) $data->user_type : 0,

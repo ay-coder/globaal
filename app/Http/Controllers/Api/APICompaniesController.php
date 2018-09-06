@@ -409,4 +409,32 @@ class APICompaniesController extends BaseApiController
             'reason' => 'Invalid Inputs or No Request exists !'
             ], 'Something went wrong !');       
     }
+
+    /**
+     * Search Providers
+     * 
+     * @return array
+     */
+    public function searchProviders(Request $request)
+    {
+        $userInfo   = $this->getAuthenticatedUser();
+        $companyId  = $request->has('company_id') ? $request->get('company_id') : access()->getCompanyId($userInfo->id);
+        if($companyId)
+        {
+            $companyProviders   = CompanyProviders::where('company_id', $companyId)->pluck('provider_id')->toArray();
+            $items              = Providers::with('user')->whereNotIn('id', $companyProviders)->get();
+
+
+            if(isset($items) && count($items))
+            {
+                $itemsOutput = $this->companiesTransformer->companyTranformSearchProviders($items);
+
+                return $this->successResponse($itemsOutput);
+            }
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+            'message' => 'Unable to find Companies!'
+            ], 'No Companies Found !');    
+    }
 }

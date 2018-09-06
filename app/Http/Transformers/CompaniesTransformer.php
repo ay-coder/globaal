@@ -104,6 +104,27 @@ class CompaniesTransformer extends Transformer
         return $response; 
     }
 
+    public function companyTranformSearchProviders($items)
+    {
+        $response = [];
+
+        if(isset($items))
+        {
+            foreach($items as $item)
+            {
+                $response[] = [
+                    'provider_id'           => (int) $item->id,
+                    'name'                  => $item->user->name,
+                    'level_of_experience'   => $item->level_of_experience,
+                    'profile_pic'           => URL::to('/').'/uploads/user/' . $item->user->profile_pic
+
+                ];
+            }
+        }
+
+        return $response;
+    }
+
     public function companyTranformWithProviders($items)
     {
         $response = [];
