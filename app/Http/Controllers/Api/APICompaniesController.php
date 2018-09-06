@@ -152,12 +152,12 @@ class APICompaniesController extends BaseApiController
         if($request->has('company_id'))
         {
             $companyId      = $request->get('company_id');
-            $companyUser    = User::where('id', $companyId)->first();
+            //$companyUser    = User::where('id', $companyId)->first();
             /*$company        = $this->repository->model->with(['company_providers', 'company_services', 'company_testimonials'])->where()->first();*/
 
 
             $companyInfo      = $this->repository->model->with(['company_providers', 'company_providers.provider', 'company_services', 'company_testimonials', 'company_services', 'company_services.service'])
-            ->where('user_id', $companyUser->id)
+            ->where('id', $companyId)
             ->first();
 
             if(isset($companyInfo))
