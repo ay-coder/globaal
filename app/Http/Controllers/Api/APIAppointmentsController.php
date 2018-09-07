@@ -50,7 +50,7 @@ class APIAppointmentsController extends BaseApiController
     {
         $userInfo   = $this->getAuthenticatedUser();
         $items      = $this->repository->model->with([
-            'service', 'user', 'provider', 'company'
+            'service', 'user', 'provider', 'company', 'company.user'
         ])->where([
             'user_id' => $userInfo->id
         ])->get();

@@ -35,6 +35,8 @@ class AppointmentsTransformer extends Transformer
                 $response[] = [
                     'appointment_id'    => (int) $item->id,
                     'user_id'           => (int) $item->user_id,
+                    'patient_name'      => isset($item->user) ? $item->user->name : '',
+                    'company_name'      => isset($item->company) ? $item->company->user->name : '',
                     'company_id'        => (int) $item->company_id,
                     'service_id'        => (int) $item->service_id,
                     'service_title'     => isset($item->service) ? $item->service->title : '',

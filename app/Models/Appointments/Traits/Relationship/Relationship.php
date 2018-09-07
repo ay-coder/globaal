@@ -44,6 +44,6 @@ trait Relationship
      */
     public function company()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(Companies::class, 'company_id');
     }
 }
