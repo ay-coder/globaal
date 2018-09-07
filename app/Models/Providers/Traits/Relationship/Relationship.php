@@ -46,6 +46,11 @@ trait Relationship
         return $this->hasMany(CompanyProviders::class, 'provider_id');
     }
 
+    public function all_companies()
+    {
+        return $this->hasMany(CompanyProviders::class, 'provider_id');
+    }
+
     public function credentials()
     {
         return $this->hasMany(Credentials::class, 'provider_id');

@@ -293,27 +293,97 @@ class APICompaniesController extends BaseApiController
      */
     public function addProvider(Request $request)
     {
-        $perPage    = $request->get('per_page') ? $request->get('per_page') : 100;
-        $offset     = $request->get('page') ? $request->get('page') : 0;
-        $orderBy    = $request->get('orderBy') ? $request->get('orderBy') : 'id';
-        $order      = $request->get('order') ? $request->get('order') : 'ASC';
-        $items      = $this->repository->model->with(['providers', 'providers.user'])
-        ->orderBy($orderBy, $order)
-        ->limit($perPage)
-        ->offset($offset)
-        ->get();
-
-        if(isset($items) && count($items))
+        if($request->has('provider_id'))
         {
-            $itemsOutput = $this->companiesTransformer->companyTranformWithProviders($items);
+            $userInfo   = $this->getAuthenticatedUser();
+            $companyId  = access()->getCompanyId($userInfo->id);
 
-            return $this->successResponse($itemsOutput);
+            if(isset($companyId) && is_numeric($companyId))
+            {
+                $companyInfo = $this->repository->model->with('company_all_providers')
+                ->where([
+                    'id' => $companyId
+                ])->first();
+
+                $isExist = $companyInfo->company_all_providers->where('provider_id', $request->get('provider_id'));
+
+                if(isset($isExist) && count($isExist))
+                {
+                    return $this->setStatusCode(400)->failureResponse([
+                        'message' => 'Provider either exists or Requested to Join'
+                        ], 'Provider either exists or Requested to Join');
+                }
+
+                $status = CompanyProviders::create([
+                    'provider_id'       => $request->get('provider_id'),
+                    'company_id'        => $companyId,
+                    'accept_by_company' => 1
+                ]);
+
+                if($status)
+                {
+                    $message = [
+                        'message' => 'Requeset sent to Provider successfully.'
+                    ];
+                    return $this->successResponse($message, 'Requeset sent to Provider successfully.');
+                }
+            }
         }
 
         return $this->setStatusCode(400)->failureResponse([
-            'message' => 'Unable to find Companies!'
-            ], 'No Companies Found !');       
+            'message' => 'Invalid Company or Provider!'
+            ], 'Invalid Company or Provider');       
     }
+
+    /**
+     * Remove Provider
+     * 
+     * @param Request $request
+     * @return json
+     */
+    public function removeProvider(Request $request)
+    {
+        if($request->has('provider_id'))
+        {
+            $userInfo   = $this->getAuthenticatedUser();
+            $companyId  = access()->getCompanyId($userInfo->id);
+
+            if(isset($companyId) && is_numeric($companyId))
+            {
+                $companyInfo = $this->repository->model->with('company_all_providers')
+                ->where([
+                    'id' => $companyId
+                ])->first();
+
+                $isExist = $companyInfo->company_all_providers->where('provider_id', $request->get('provider_id'));
+
+                if(!isset($isExist))
+                {
+                    return $this->setStatusCode(400)->failureResponse([
+                        'message' => 'No Provider exists'
+                        ], 'No Provider exists');
+                }
+
+                $status = CompanyProviders::where([
+                    'provider_id'       => $request->get('provider_id'),
+                    'company_id'        => $companyId
+                ])->delete();
+
+                if($status)
+                {
+                    $message = [
+                        'message' => 'Provider removed successfully.'
+                    ];
+                    return $this->successResponse($message, 'Provider removed successfully.');
+                }
+            }
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+            'message' => 'Invalid Company or Provider!'
+            ], 'Invalid Company or Provider');       
+    }
+    
 
     /**
      * Provider Requests

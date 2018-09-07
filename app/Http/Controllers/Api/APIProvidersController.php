@@ -361,4 +361,104 @@ class APIProvidersController extends BaseApiController
             'reason' => 'Invalid Inputs or No Request exists !'
             ], 'Something went wrong !');       
     }
+
+    /**
+     * Add Company
+     * 
+     * @param Request $request
+     */
+    public function addCompany(Request $request)
+    {
+        if($request->has('company_id'))
+        {
+            $userInfo   = $this->getAuthenticatedUser();
+            $providerId = access()->getProviderId($userInfo->id);
+            
+            if(isset($providerId) && is_numeric($providerId))
+            {
+               $providerInfo = $this->repository->model->with('all_companies')
+               ->where('id', $providerId)->first();
+
+               if(isset($providerInfo))
+               {    
+                    $isExist = $providerInfo->all_companies->where('company_id', $request->get('company_id'));
+
+                    if(isset($isExist) && count($isExist))
+                    {
+                        return $this->setStatusCode(400)->failureResponse([
+                        'message' => 'Company either exists or Requested to Join'
+                        ], 'Company either exists or Requested to Join');
+                    }
+
+                    $status = CompanyProviders::create([
+                        'provider_id'   => $providerId,
+                        'company_id'    => $request->get('company_id'),
+                        'accept_by_provider' => 1
+                    ]);
+
+                    if($status)
+                    {
+                        $message = [
+                            'message' => 'Requeset sent to Company successfully.'
+                        ];
+                        return $this->successResponse($message, 'Requeset sent to Company successfully.');
+                    }
+                }
+            }
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+            'reason' => 'Invalid Inputs or No Company Exists!'
+            ], 'Invalid Inputs or No Company Exists');     
+    }
+
+
+    /**
+     * Remove Company
+     * 
+     * @param Request $request
+     */
+    public function removeCompany(Request $request)
+    {
+        if($request->has('company_id'))
+        {
+            $userInfo   = $this->getAuthenticatedUser();
+            $providerId = access()->getProviderId($userInfo->id);
+            
+            if(isset($providerId) && is_numeric($providerId))
+            {
+               $providerInfo = $this->repository->model->with('all_companies')
+               ->where('id', $providerId)->first();
+
+               if(isset($providerInfo))
+               {    
+                    $isExist = $providerInfo->all_companies->where('company_id', $request->get('company_id'));
+
+                    if(!isset($isExist))
+                    {
+                        return $this->setStatusCode(400)->failureResponse([
+                            'reason' => 'No Company Exists !'
+                            ], 'No Company Exists !');  
+                    }
+
+                    $status = CompanyProviders::where([
+                        'provider_id'   => $providerId,
+                        'company_id'    => $request->get('company_id')
+                    ])->delete();
+
+                    if($status)
+                    {
+                        $message = [
+                            'message' => 'Company removed successfully.'
+                        ];
+                        return $this->successResponse($message, 'Company removed successfully.');
+                    }
+                }
+            }
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+            'reason' => 'Invalid Inputs or No Company Exists!'
+            ], 'Invalid Inputs or No Company Exists');     
+    }
 }

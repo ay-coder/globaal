@@ -304,7 +304,7 @@ class UsersController extends BaseApiController
         $repository = new UserRepository;
         $input      = $request->all();
         $input      = array_merge($input, [
-            'profile_pic' => 'default.png',
+            'profile_pic'   => 'company_default.png',
             'user_type'     => 3
         ]);
         if($request->file('profile_pic'))

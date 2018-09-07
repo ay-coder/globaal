@@ -40,6 +40,7 @@ class CredentialsTransformer extends Transformer
 
                 $response[] = [
                     'credential_id' => (int) $item->id,
+                    'title'         => $item->title,
                     'provider_id'   => (int) $item->provider->id,
                     'provider_name' => $item->provider->name
                 ];

@@ -23,8 +23,7 @@ Route::group(['namespace' => 'Api'], function()
 
     Route::get('companies-with-distance', 'APICompaniesController@getCompaniesWithDistances')->name('companies.companies');
 
-
-    /*Route::post('companies/add-provider', 'APICompaniesController@addProvider')->name('companies.add-provider');
-    Route::post('companies/remove-provider', 'APICompaniesController@removeProvider')->name('companies.remove-provider');*/
+    Route::post('companies/add-provider', 'APICompaniesController@addProvider')->name('companies.add-provider');
+    Route::post('companies/remove-provider', 'APICompaniesController@removeProvider')->name('companies.remove-provider');
 });
 ?>

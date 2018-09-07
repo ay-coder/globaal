@@ -29,6 +29,16 @@ trait Relationship
 	}
 
 	/**
+	 * Providers
+	 * 
+	 * @return  \Illuminate\Database\Eloquent\Relations\HasMany
+	 */
+	public function company_all_providers()
+	{
+		return $this->hasMany(CompanyProviders::class, 'company_id');	
+	}
+
+	/**
 	 * Services
 	 * 
 	 * @return  \Illuminate\Database\Eloquent\Relations\HasMany
