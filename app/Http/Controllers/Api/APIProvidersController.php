@@ -277,23 +277,28 @@ class APIProvidersController extends BaseApiController
     public function companyRequests(Request $request)
     {
         $userInfo   = $this->getAuthenticatedUser();
-        $requests   = CompanyProviders::where([
-            'provider_id'           => $userInfo->id,
-            'accept_by_provider'    => 0
-        ])->with(['company', 'company.user', 'provider'])
-        ->orderBy('id', 'desc')
-        ->get();
-        
+        $providerId = access()->getProviderId($userInfo->id);
 
-        if($requests && count($requests))
+        if(isset($providerId))
         {
-            $itemsOutput = $this->providersTransformer->transCompanyRequests($requests);
+            $requests   = CompanyProviders::where([
+                'provider_id'           => $userInfo->id,
+                'accept_by_provider'    => 0
+            ])->with(['company', 'company.user', 'provider'])
+            ->orderBy('id', 'desc')
+            ->get();
+            
+            if($requests && count($requests))
+            {
+                $itemsOutput = $this->providersTransformer->transCompanyRequests($requests);
 
-            return $this->successResponse($itemsOutput);
+                return $this->successResponse($itemsOutput);
+            }
         }
+        
        
         return $this->setStatusCode(400)->failureResponse([
-            'reason' => 'Invalid Inputs or No Service exists !'
+            'reason' => 'Invalid Inputs or No Requests exists !'
             ], 'Something went wrong !');       
     }
 
