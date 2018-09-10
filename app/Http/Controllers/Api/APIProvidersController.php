@@ -287,7 +287,7 @@ class APIProvidersController extends BaseApiController
             ])->with(['company', 'company.user', 'provider'])
             ->orderBy('id', 'desc')
             ->get();
-            
+
             if($requests && count($requests))
             {
                 $itemsOutput = $this->providersTransformer->transCompanyRequests($requests);
@@ -313,20 +313,25 @@ class APIProvidersController extends BaseApiController
         if($request->has('request_id'))
         {
             $userInfo   = $this->getAuthenticatedUser();
-            $request    = CompanyProviders::where([
-                'provider_id'           => $userInfo->id,
-                'id'                    => $request->get('request_id'),
-                'accept_by_provider'    => 0
-            ])
-            ->first();
-        
-            if($request && count($request))
-            {   
-                $request->accept_by_provider = 1;
+            $providerId = access()->getProviderId($userInfo->id);
 
-                if($request->save())
-                {
-                    return $this->successResponse(['message' => 'Accepted Request Successfully!'], 'Accepted Request Successfully');
+            if(isset($providerId))
+            {
+                $request    = CompanyProviders::where([
+                    'provider_id'           => $providerId,
+                    'id'                    => $request->get('request_id'),
+                    'accept_by_provider'    => 0
+                ])
+                ->first();
+
+                if($request && count($request))
+                {   
+                    $request->accept_by_provider = 1;
+
+                    if($request->save())
+                    {
+                        return $this->successResponse(['message' => 'Accepted Request Successfully!'], 'Accepted Request Successfully');
+                    }
                 }
             }
         }
@@ -347,20 +352,25 @@ class APIProvidersController extends BaseApiController
         if($request->has('request_id'))
         {
             $userInfo   = $this->getAuthenticatedUser();
-            $request    = CompanyProviders::where([
-                'provider_id'           => $userInfo->id,
-                'id'                    => $request->get('request_id'),
-                'accept_by_provider'    => 0
-            ])
-            ->first();
-        
-            if($request && count($request))
-            {   
-                if($request->delete())
-                {
-                    return $this->successResponse(['message' => 'Rejected Request Successfully!'], 'Rejected Request Successfully');
+            $providerId = access()->getProviderId($userInfo->id);
+            
+            if(isset($providerId))
+            {
+                $request    = CompanyProviders::where([
+                    'provider_id'           => $providerId,
+                    'id'                    => $request->get('request_id'),
+                    'accept_by_provider'    => 0
+                ])
+                ->first();
+                if($request && count($request))
+                {   
+                    if($request->delete())
+                    {
+                        return $this->successResponse(['message' => 'Rejected Request Successfully!'], 'Rejected Request Successfully');
+                    }
                 }
             }
+        
         }
         
         return $this->setStatusCode(400)->failureResponse([
