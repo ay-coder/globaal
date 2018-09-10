@@ -282,7 +282,7 @@ class APIProvidersController extends BaseApiController
         if(isset($providerId))
         {
             $requests   = CompanyProviders::where([
-                'provider_id'           => $userInfo->id,
+                'provider_id'           => $providerId,
                 'accept_by_provider'    => 0
             ])->with(['company', 'company.user', 'provider'])
             ->orderBy('id', 'desc')
