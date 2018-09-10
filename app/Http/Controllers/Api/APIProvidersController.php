@@ -8,6 +8,7 @@ use App\Repositories\Providers\EloquentProvidersRepository;
 use App\Models\Services\Services;
 use App\Models\ProviderServices\ProviderServices;
 use App\Models\CompanyProviders\CompanyProviders;
+use App\Models\Companies\Companies;
 
 class APIProvidersController extends BaseApiController
 {
@@ -461,4 +462,34 @@ class APIProvidersController extends BaseApiController
             'reason' => 'Invalid Inputs or No Company Exists!'
             ], 'Invalid Inputs or No Company Exists');     
     }
+
+    /**
+     * Search Company
+     * 
+     * @return array
+     */
+    public function searchCompany(Request $request)
+    {
+        $userInfo   = $this->getAuthenticatedUser();
+        $providerId = $request->has('provider_id') ? $request->get('provider_id') : access()->getProviderId($userInfo->id);
+
+        if($providerId)
+        {
+            $providerCompanies   = CompanyProviders::where('provider_id', $providerId)->pluck('company_id')->toArray();
+
+            $items              = Companies::with('user')->whereNotIn('id', $providerCompanies)->get();
+
+            if(isset($items) && count($items))
+            {
+                $itemsOutput = $this->providersTransformer->providerTransformCompanies($items);
+
+                return $this->successResponse($itemsOutput);
+            }
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+            'message' => 'Unable to find Companies!'
+            ], 'No Companies Found !');    
+    }
+
 }

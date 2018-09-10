@@ -178,4 +178,28 @@ class ProvidersTransformer extends Transformer
 
         return $response;
     }
+
+    /**
+     * Provider Transform Companies
+     * 
+     * @param array $items
+     * @return array
+     */
+    public function providerTransformCompanies($items)
+    {
+        $response = [];
+
+        if(isset($items) && count($items))
+        {
+            foreach($items as $item)
+            {
+                $response[] = [
+                    'company_id'    => (int) $item->id,
+                    'company_name'  => $item->company_name,
+                    'profile_pic'   => URL::to('/').'/uploads/user/' . $item->user->profile_pic
+                ];
+            }
+        }
+        return $response;
+    }
 }
