@@ -136,7 +136,7 @@ class ProvidersTransformer extends Transformer
                 'provider_id'   => (int) $item->id,
                 'name'          => $item->user->name,
                 'email'         => $item->user->email,
-                'company_id'    => (int) $item->company->id,
+                'company_id'    => (int) isset($item->company) ? $item->company->id : 0,
                 'company_name'  => $this->nulltoBlank($item->company->company_name),
                 'profile_pic'   => URL::to('/').'/uploads/user/' . $item->user->profile_pic, 
                 'level_of_experience'   => $item->leavelOfExperience->level_of_experience,
