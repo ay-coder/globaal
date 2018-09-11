@@ -80,7 +80,7 @@ class CompaniesTransformer extends Transformer
                 $testimonials[] = [
                     'testimonial_id'=> (int) $testimonial->id,
                     'title'         => $testimonial->title,
-                    'description'   => $testimonial->description,
+                    'description'   => $this->nulltoBlank($testimonial->description),
                     'before_image'  =>  URL::to('/').'/uploads/testimonials/'.$testimonial->before_image,
                     'after_image'   =>  URL::to('/').'/uploads/testimonials/'.$testimonial->after_image,
                 ];
@@ -93,6 +93,8 @@ class CompaniesTransformer extends Transformer
                 "company_name"  =>  $this->nulltoBlank($companyInfo->company_name),
                 "start_time"    =>  $this->nulltoBlank($companyInfo->start_time),
                 "end_time"      =>  $this->nulltoBlank($companyInfo->end_time),
+                'address'       => $this->nulltoBlank($companyInfo->user->address),
+                'phone'         => $this->nulltoBlank($companyInfo->user->mobile),
                 'profile_pic'   => URL::to('/').'/uploads/user/' . $companyInfo->user->profile_pic, 
                 'address'       => $this->nulltoBlank($companyInfo->user->address),
                 'city'                  => $this->nulltoBlank($companyInfo->user->city),

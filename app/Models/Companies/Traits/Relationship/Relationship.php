@@ -45,7 +45,7 @@ trait Relationship
 	 */
 	public function company_services()
 	{
-		return $this->hasMany(CompanyServices::class, 'user_id');	
+		return $this->hasMany(CompanyServices::class, 'company_id');	
 	}
 
 	/**
