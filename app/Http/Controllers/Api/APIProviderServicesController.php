@@ -58,13 +58,15 @@ class APIProviderServicesController extends BaseApiController
         if(isset($provider) && count($provider))
         {
             $itemsOutput = $this->providerservicesTransformer->transformProviderWithServices($provider, $services);
-
-            return $this->successResponse($itemsOutput);
+            if(isset($itemsOutput) && count($itemsOutput))
+            {
+                return $this->successResponse($itemsOutput);
+            }
         }
 
-        return $this->setStatusCode(400)->failureResponse([
-            'message' => 'Unable to find ProviderServices!'
-            ], 'No ProviderServices Found !');
+        return $this->setStatusCode(200)->failureResponse([
+            'message' => 'No Services Found !'
+            ], 'No Services Found !');
     }
 
     /**

@@ -61,7 +61,7 @@ class APITestimonialsController extends BaseApiController
 
         return $this->setStatusCode(400)->failureResponse([
             'message' => 'Unable to find Testimonials!'
-            ], 'No Testimonials Found !');
+            ], 'No Testimonials Found');
     }
 
     /**

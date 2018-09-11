@@ -47,12 +47,15 @@ class CompaniesTransformer extends Transformer
         $testimonials   = [];
         $services       = [];
 
-        if(isset($companyInfo->company_providers))
+        if(isset($companyInfo->company_all_providers))
         {
-            foreach($companyInfo->company_providers as $provider)
+            foreach($companyInfo->company_all_providers as $provider)
             {
+                $isConnected = $provider->accept_by_provider == 1 && $provider->accept_by_company == 1 ? 1 : 0;
+
                 $providers[] = [
                     'provider_id'           => (int) $provider->provider_id,
+                    'is_connected'          => $isConnected,
                     'name'                  => $provider->provider->name,
                     'profile_pic'           => URL::to('/').'/uploads/user/' . $provider->provider->profile_pic, 
                 ];
@@ -106,15 +109,20 @@ class CompaniesTransformer extends Transformer
 
     public function companyTranformSearchProviders($items)
     {
-        $response = [];
+        $response       = [];
+        $userId         = access()->user()->id;
+        $companyId      = access()->getProviderId($userId);
+        $providerIds    = access()->getProviderCompanies($companyId);
 
         if(isset($items))
         {
             foreach($items as $item)
             {
-                $response[] = [
+                $isConnected    = in_array($item->id, $providerIds) ? 1 :0;
+                $response[]     = [
                     'provider_id'           => (int) $item->id,
                     'name'                  => $item->user->name,
+                    'is_connected'          => $isConnected,
                     'level_of_experience'   => $item->level_of_experience,
                     'profile_pic'           => URL::to('/').'/uploads/user/' . $item->user->profile_pic
 

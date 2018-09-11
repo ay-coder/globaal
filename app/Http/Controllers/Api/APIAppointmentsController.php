@@ -49,11 +49,16 @@ class APIAppointmentsController extends BaseApiController
     public function index(Request $request)
     {
         $userInfo   = $this->getAuthenticatedUser();
+        $perPage    = $request->get('per_page') ? $request->get('per_page') : 100;
+        $offset     = $request->get('page') ? $request->get('page') : 0;
         $items      = $this->repository->model->with([
             'service', 'user', 'provider', 'company', 'company.user'
         ])->where([
             'user_id' => $userInfo->id
-        ])->get();
+        ])
+        ->limit($perPage)
+        ->offset($offset)
+        ->get();
 
         if(isset($items) && count($items))
         {
@@ -66,6 +71,40 @@ class APIAppointmentsController extends BaseApiController
             'message' => 'Unable to find Appointments!'
             ], 'No Appointments Found !');
     }
+
+    /**
+     * Get Past Appointments
+     *
+     * @param Request $request
+     * @return json
+     */
+    public function getPastData(Request $request)
+    {
+        $userInfo   = $this->getAuthenticatedUser();
+        $perPage    = $request->get('per_page') ? $request->get('per_page') : 100;
+        $offset     = $request->get('page') ? $request->get('page') : 0;
+        $items      = $this->repository->model->with([
+            'service', 'user', 'provider', 'company', 'company.user'
+        ])->where([
+            'user_id'   => $userInfo->id,
+        ])
+        ->where('booking_date', '<', date('Y-m-d'))
+        ->limit($perPage)
+        ->offset($offset)
+        ->get();
+
+        if(isset($items) && count($items))
+        {
+            $itemsOutput = $this->appointmentsTransformer->showAllAppointments($items);
+
+            return $this->successResponse($itemsOutput);
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+            'message' => 'Unable to find Appointments!'
+            ], 'No Appointments Found !');
+    }
+    
 
     /**
      * Create

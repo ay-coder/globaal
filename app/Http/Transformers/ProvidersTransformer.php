@@ -113,8 +113,11 @@ class ProvidersTransformer extends Transformer
             {
                 foreach($item->companies as $company)
                 {
+                    $isConnected = $company->accept_by_provider == 1 && $company->accept_by_company == 1 ? 1 : 0;
+
                     $allCompanies[] = [
                         'company_id'    => (int) $company->company_id,
+                        'is_connected'  => $isConnected,
                         'company_name'  => isset($company->company->company_name) ? $company->company->company_name : ''
                     ];
                 }
@@ -131,11 +134,12 @@ class ProvidersTransformer extends Transformer
                 }
             }
 
-
             $response[] = [
                 'provider_id'   => (int) $item->id,
                 'name'          => $item->user->name,
                 'email'         => $item->user->email,
+                'phone'         => $this->nulltoBlank($item->user->mobile),
+                'address'       => $this->nulltoBlank($item->user->address),
                 'company_id'    => (int) isset($item->company) ? $item->company->id : 0,
                 'company_name'  => isset($item->company) ? $this->nulltoBlank($item->company->company_name) : '',
                 'profile_pic'   => URL::to('/').'/uploads/user/' . $item->user->profile_pic, 
@@ -187,14 +191,20 @@ class ProvidersTransformer extends Transformer
      */
     public function providerTransformCompanies($items)
     {
-        $response = [];
+        $response   = [];
+        $userId     = access()->user()->id;
+        $providerId = access()->getProviderId($userId);
+        $companyIds = access()->getProviderCompanies($providerId);
 
         if(isset($items) && count($items))
         {
             foreach($items as $item)
             {
+                $isConnected = in_array($item->id, $companyIds) ? 1 : 0;
+
                 $response[] = [
                     'company_id'    => (int) $item->id,
+                    'is_connected'  => $isConnected,
                     'company_name'  => $item->company_name,
                     'profile_pic'   => URL::to('/').'/uploads/user/' . $item->user->profile_pic
                 ];

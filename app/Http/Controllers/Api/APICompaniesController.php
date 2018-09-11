@@ -156,7 +156,7 @@ class APICompaniesController extends BaseApiController
             /*$company        = $this->repository->model->with(['company_providers', 'company_services', 'company_testimonials'])->where()->first();*/
 
 
-            $companyInfo      = $this->repository->model->with(['company_providers', 'company_providers.provider', 'company_services', 'company_testimonials', 'company_services', 'company_services.service'])
+            $companyInfo      = $this->repository->model->with(['company_all_providers', 'company_providers', 'company_providers.provider', 'company_services', 'company_testimonials', 'company_services', 'company_services.service'])
             ->where('id', $companyId)
             ->first();
 

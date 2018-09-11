@@ -5,6 +5,7 @@ namespace App\Services\Access;
 use Illuminate\Contracts\Auth\Authenticatable;
 use App\Models\Providers\Providers;
 use App\Models\Companies\Companies;
+use App\Models\CompanyProviders\CompanyProviders;
 
 /**
  * Class Access.
@@ -225,5 +226,49 @@ class Access
         }
 
         return '';
+    }
+
+    /**
+     * Get Provider Companies
+     * 
+     * @param int $providerId
+     * @return array
+     */
+    public function getProviderCompanies($providerId = null)
+    {
+        $companyIds = [];
+
+        if($providerId)
+        {
+            $companyIds = CompanyProviders::where([
+                'provider_id'           => $providerId,
+                'accept_by_provider'    => 1,
+                'accept_by_company'     => 1
+            ])->pluck('company_id')->toArray();
+        }
+
+        return $companyIds;
+    }
+
+    /**
+     * Get Provider Companies
+     * 
+     * @param int $providerId
+     * @return array
+     */
+    public function getCompanyProviders($companyId = null)
+    {
+        $providerIds = [];
+
+        if($companyId)
+        {
+            $providerIds = CompanyProviders::where([
+                'company_id'            => $companyId,
+                'accept_by_provider'    => 1,
+                'accept_by_company'     => 1
+            ])->pluck('company_id')->toArray();
+        }
+
+        return $providerIds;
     }
 }
