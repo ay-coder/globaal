@@ -842,7 +842,7 @@ class UsersController extends BaseApiController
         }
 
         return $this->setStatusCode(200)->failureResponse([
-            'reason' => 'Invalid Inputs'
+            'reason' => 'Invalid Inputs or No data Found'
             ], 'Something went wrong !');
     }
 }
