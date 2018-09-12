@@ -138,7 +138,7 @@ class ProvidersTransformer extends Transformer
                 'provider_id'   => (int) $item->id,
                 'name'          => $item->user->name,
                 'email'         => $item->user->email,
-                'phone'         => $this->nulltoBlank($item->user->mobile),
+                'mobile'         => $this->nulltoBlank($item->user->mobile),
                 'address'       => $this->nulltoBlank($item->user->address),
                 'company_id'    => (int) isset($item->company) ? $item->company->id : 0,
                 'company_name'  => isset($item->company) ? $this->nulltoBlank($item->company->company_name) : '',
