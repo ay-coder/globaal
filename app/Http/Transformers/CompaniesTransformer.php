@@ -94,7 +94,7 @@ class CompaniesTransformer extends Transformer
                 "start_time"    =>  $this->nulltoBlank($companyInfo->start_time),
                 "end_time"      =>  $this->nulltoBlank($companyInfo->end_time),
                 'address'       => $this->nulltoBlank($companyInfo->user->address),
-                'phone'         => $this->nulltoBlank($companyInfo->user->mobile),
+                'mobile'         => $this->nulltoBlank($companyInfo->user->mobile),
                 'profile_pic'   => URL::to('/').'/uploads/user/' . $companyInfo->user->profile_pic, 
                 'address'       => $this->nulltoBlank($companyInfo->user->address),
                 'city'                  => $this->nulltoBlank($companyInfo->user->city),
