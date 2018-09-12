@@ -73,7 +73,9 @@ class APICompaniesController extends BaseApiController
     public function getCompaniesWithDistances(Request $request)
     {
         $userInfo   = $this->getAuthenticatedUser();
-        $companies   = DB::select("SELECT *, ( 6371 * acos( cos( radians($userInfo->lat) ) * cos( radians( `lat` ) ) * cos( radians( `long` ) - radians($userInfo->long) ) + sin( radians($userInfo->lat) ) * sin( radians( `lat` ) ) ) ) AS distance
+        $lat        = $request->has('lat') ? $request->get('lat') : $userInfo->lat;
+        $long       = $request->has('long') ? $request->get('long') : $userInfo->long;
+        $companies   = DB::select("SELECT *, ( 6371 * acos( cos( radians($lat) ) * cos( radians( `lat` ) ) * cos( radians( `long` ) - radians($long) ) + sin( radians($lat) ) * sin( radians( `lat` ) ) ) ) AS distance
         FROM users
         where user_type = 3
         AND users.id != $userInfo->id
