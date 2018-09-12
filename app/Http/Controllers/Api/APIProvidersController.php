@@ -299,7 +299,7 @@ class APIProvidersController extends BaseApiController
        
         return $this->setStatusCode(400)->failureResponse([
             'reason' => 'Invalid Inputs or No Requests exists !'
-            ], '“No Data Found');       
+            ], 'No Data Found');       
     }
 
     /**

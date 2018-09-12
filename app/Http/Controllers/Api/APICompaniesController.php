@@ -410,8 +410,8 @@ class APICompaniesController extends BaseApiController
         }
        
         return $this->setStatusCode(400)->failureResponse([
-            'reason' => 'Invalid Inputs or No Service exists !'
-            ], 'Something went wrong !');       
+            'reason' => 'No Requests found!'
+            ], 'No Requests found!');       
     }
 
     /**
