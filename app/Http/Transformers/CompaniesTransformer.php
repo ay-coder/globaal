@@ -57,7 +57,7 @@ class CompaniesTransformer extends Transformer
                     'provider_id'           => (int) $provider->provider_id,
                     'is_connected'          => $isConnected,
                     'name'                  => $provider->provider->user->name,
-                    'profile_pic'           => URL::to('/').'/uploads/user/' . $provider->provider->profile_pic, 
+                    'profile_pic'           => URL::to('/').'/uploads/user/' . $provider->provider->user->profile_pic, 
                 ];
             }
         }
