@@ -47,7 +47,9 @@ class APICredentialsController extends BaseApiController
      */
     public function index(Request $request)
     {
-        $items      = $this->repository->getAll();
+        $userInfo   = $this->getAuthenticatedUser();
+        $providerId = access()->getProviderId($userInfo->id);
+        $items      = $this->repository->where('provider_id', $providerId)->get();
 
         if(isset($items) && count($items))
         {
@@ -71,7 +73,8 @@ class APICredentialsController extends BaseApiController
     {
         $input      = $request->all();
         $userInfo   = $this->getAuthenticatedUser();
-        $input      = array_merge($input, ['provider_id' => $userInfo->id]);
+        $providerId = access()->getProviderId($userInfo->id);
+        $input      = array_merge($input, ['provider_id' => $providerId]);
         $model      = $this->repository->create($input);
 
         if($model)
@@ -151,9 +154,10 @@ class APICredentialsController extends BaseApiController
         {
             $credentialId   = $request->get('credential_id');
             $userInfo       = $this->getAuthenticatedUser();
+            $providerId     = access()->getProviderId($userInfo->id);
             $credential     = $this->repository->model->where([
-                'id' => $credentialId,
-                'provider_id' => $userInfo->id
+                'id'            => $credentialId,
+                'provider_id'   => $providerId
             ])->first();
 
             if($credential)
