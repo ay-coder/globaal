@@ -75,7 +75,8 @@ class APICompaniesController extends BaseApiController
         $userInfo   = $this->getAuthenticatedUser();
         $lat        = $request->has('lat') ? $request->get('lat') : $userInfo->lat;
         $long       = $request->has('long') ? $request->get('long') : $userInfo->long;
-        $companies   = DB::select("SELECT *, ( 6371 * acos( cos( radians($lat) ) * cos( radians( `lat` ) ) * cos( radians( `long` ) - radians($long) ) + sin( radians($lat) ) * sin( radians( `lat` ) ) ) ) AS distance
+        $companies   = DB::select("SELECT *, ( 6371 * acos( cos( radians($lat) ) * cos( radians( `lat` ) ) * cos( radians( `long` ) - radians($long
+            ) ) + sin( radians($lat) ) * sin( radians( `lat` ) ) ) ) AS distance
         FROM users
         where user_type = 3
         AND users.id != $userInfo->id
@@ -242,7 +243,7 @@ class APICompaniesController extends BaseApiController
         $offset     = $request->get('page') ? $request->get('page') : 0;
         $orderBy    = $request->get('orderBy') ? $request->get('orderBy') : 'id';
         $order      = $request->get('order') ? $request->get('order') : 'ASC';
-        $items      = $this->repository->model->with(['company_providers', 'company_providers.provider'])
+        $items      = $this->repository->model->with(['company_providers', 'company_providers.provider', 'company_providers.provider.user',])
         ->orderBy($orderBy, $order)
         ->limit($perPage)
         ->offset($offset)

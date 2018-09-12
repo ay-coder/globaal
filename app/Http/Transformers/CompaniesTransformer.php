@@ -152,8 +152,8 @@ class CompaniesTransformer extends Transformer
                     {
                         $providers[] = [
                             'provider_id'           => $provider->provider_id,
-                            'name'                  => $provider->provider->name,
-                            'profile_pic'           => URL::to('/').'/uploads/user/' . $provider->provider->profile_pic, 
+                            'name'                  => $provider->provider->user->name,
+                            'profile_pic'           => URL::to('/').'/uploads/user/' . $provider->provider->user->profile_pic, 
                         ];
                     }
                 }
@@ -213,6 +213,9 @@ class CompaniesTransformer extends Transformer
                         "company_name"  =>  $company->company_name,
                         "start_time"    =>  $company->start_time,
                         "end_time"      =>  $company->end_time,
+                        'profile_pic'   => URL::to('/').'/uploads/user/' . $company->user->profile_pic, 
+                        'lat'           => (float) $this->nulltoBlank($company->user->lat), 
+                        'long'          => (float) $this->nulltoBlank($company->user->long), 
                         'distance'      => (float) number_format($item->distance, 3)
                     ];
                 }
