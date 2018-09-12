@@ -22,6 +22,6 @@ trait Relationship
      */
     public function provider()
     {
-        return $this->belongsTo(User::class, 'provider_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
