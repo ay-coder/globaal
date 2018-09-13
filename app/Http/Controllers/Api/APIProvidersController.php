@@ -9,6 +9,7 @@ use App\Models\Services\Services;
 use App\Models\ProviderServices\ProviderServices;
 use App\Models\CompanyProviders\CompanyProviders;
 use App\Models\Companies\Companies;
+use DB;
 
 class APIProvidersController extends BaseApiController
 {
@@ -507,4 +508,74 @@ class APIProvidersController extends BaseApiController
             ], 'No Companies Found !');    
     }
 
+    /**
+     * List of All Providers
+     *
+     * @param Request $request
+     * @return json
+     */
+    public function filter(Request $request)
+    {
+        $serviceId  = $request->has('services') ? explode(',', $request->get('services')) : [];
+        $experience = $request->has('experience') ? explode(',', $request->get('experience')) : false;
+        $distance   = [];
+        $lat        = $request->has('lat') ? $request->get('lat') : false;
+        $long       = $request->has('long') ? $request->get('long') : false;
+
+        $query      = $this->repository->model->whereHas('services', function($q) use($serviceId)
+        {
+            $q->whereIn('service_id', $serviceId);
+        });
+
+        if($experience)
+        {
+            $query->whereIn('level_of_experience',$experience);
+        }
+
+        if($lat && $long)
+        {
+            $distance   = DB::select("SELECT id, ( 6371 * acos( cos( radians($lat) ) * cos( radians( `lat` ) ) * cos( radians( `long` ) - radians($long
+                ) ) + sin( radians($lat) ) * sin( radians( `lat` ) ) ) ) AS distance
+            FROM users
+            where user_type = 2
+            ORDER BY distance ASC");
+            $distance = collect($distance);
+        }
+
+        $items = $query->with([
+            'companies', 'companies.company', 'services', 
+            'services.service', 'user', 'leavelOfExperience', 'company'
+        ])
+        ->get();
+
+        $items = $items->map(function($item) use($distance)
+        {
+            if(isset($distance) && count($distance))
+            {
+                $singleUser = $distance->where('id', $item->user_id);
+                
+                if(isset($singleUser) && isset($singleUser->distance))
+                {
+                    $item->distance = $singleUser->distance;
+                }
+            }
+
+            $item->distance = null;
+
+            return $item;
+        });
+
+
+        $items = $items->sortBy('distance');
+        if(isset($items) && count($items))
+        {
+            $itemsOutput = $this->providersTransformer->transformProviders($items);
+
+            return $this->successResponse($itemsOutput);
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+            'message' => 'Unable to find Providers!'
+            ], 'No Providers Found !');
+    }
 }
