@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Http\Transformers\CompaniesTransformer;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Repositories\Companies\EloquentCompaniesRepository;
+use App\Repositories\Providers\EloquentProvidersRepository;
 use App\Models\CompanyProviders\CompanyProviders;
 use App\Http\Transformers\ProvidersTransformer;
 use App\Models\Access\User\User;
@@ -41,6 +42,7 @@ class APICompaniesController extends BaseApiController
     public function __construct()
     {
         $this->repository                       = new EloquentCompaniesRepository();
+        $this->providerRepository   = new EloquentProvidersRepository();
         $this->companiesTransformer = new CompaniesTransformer();
         $this->providersTransformer = new ProvidersTransformer();
     }
@@ -509,5 +511,89 @@ class APICompaniesController extends BaseApiController
         return $this->setStatusCode(400)->failureResponse([
             'message' => 'Unable to find Companies!'
             ], 'No Companies Found !');    
+    }
+
+    /**
+     * List of All Company Providers
+     *
+     * @param Request $request
+     * @return json
+     */
+    public function filter(Request $request)
+    {
+        $serviceId  = $request->has('services') ? explode(',', $request->get('services')) : [];
+        $experience = $request->has('experience') ? explode(',', $request->get('experience')) : false;
+        $distance   = [];
+        $lat        = $request->has('lat') ? $request->get('lat') : false;
+        $long       = $request->has('long') ? $request->get('long') : false;
+
+        $query      = $this->providerRepository->model->whereHas('services', function($q) use($serviceId)
+        {
+            $q->whereIn('service_id', $serviceId);
+        });
+
+        if($experience)
+        {
+            $query->whereIn('level_of_experience',$experience);
+        }
+
+       /* if($lat && $long)
+        {
+            $distance   = DB::select("SELECT id, ( 6371 * acos( cos( radians($lat) ) * cos( radians( `lat` ) ) * cos( radians( `long` ) - radians($long
+                ) ) + sin( radians($lat) ) * sin( radians( `lat` ) ) ) ) AS distance
+            FROM users
+            where user_type = 2
+            ORDER BY distance ASC");
+            $distance = collect($distance);
+        }*/
+
+        $providerIds = $query->pluck('id')->toArray();
+        
+
+        /*$items = $items->map(function($item) use($distance)
+        {
+            if(isset($distance) && count($distance))
+            {
+                $singleUser = $distance->where('id', $item->user_id);
+                
+                if(isset($singleUser) && isset($singleUser->distance))
+                {
+                    $item->distance = $singleUser->distance;
+                }
+            }
+
+            $item->distance = null;
+
+            return $item;
+        });*/
+
+
+        //$items      = $items->sortBy('distance');
+        $items  = $this->repository->model->whereHas('company_all_providers', function($q) use($providerIds)
+            {
+                $q->whereIn('provider_id', $providerIds);
+            })->with([
+            'company_all_providers','company_all_providers.provider.user',
+            'company_providers', 'company_providers.provider', 
+            'company_services', 'company_testimonials', 
+            'company_services', 'company_services.service'
+        ])->get();
+
+
+        
+
+        if(isset($items) && count($items))
+        {
+            $itemsOutput = $this->companiesTransformer->companyTranformWithProviders($items);
+
+            return $this->successResponse($itemsOutput);
+        }
+
+
+       
+
+        return $this->setStatusCode(400)->failureResponse([
+            'message' => 'No Companies Found!'
+            ], 'No Companies Found!');
     }
 }

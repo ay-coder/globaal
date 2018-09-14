@@ -25,5 +25,7 @@ Route::group(['namespace' => 'Api'], function()
 
     Route::post('companies/add-provider', 'APICompaniesController@addProvider')->name('companies.add-provider');
     Route::post('companies/remove-provider', 'APICompaniesController@removeProvider')->name('companies.remove-provider');
+
+    Route::post('companies/provider-filter', 'APICompaniesController@filter')->name('companies.filter');
 });
 ?>

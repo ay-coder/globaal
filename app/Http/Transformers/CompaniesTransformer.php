@@ -157,17 +157,20 @@ class CompaniesTransformer extends Transformer
                         ];
                     }
                 }
-                
-                $response[] = [
-                    "company_id"    => (int) $item->id,
-                    "company_name"  =>  $this->nulltoBlank($item->company_name),
-                    "profile_pic"  =>  URL::to('/').'/uploads/user/' . $item->user->profile_pic,
-                    'lat'           => $this->nulltoBlank($item->user->lat),
-                    'long'           => $this->nulltoBlank($item->user->long),
-                    "start_time"    =>  $this->nulltoBlank($item->start_time),
-                    "end_time"      =>  $this->nulltoBlank($item->end_time),
-                    'providers'     => $providers
-                ];
+
+                if(isset($providers) && count($providers))
+                {
+                    $response[] = [
+                        "company_id"    => (int) $item->id,
+                        "company_name"  =>  $this->nulltoBlank($item->company_name),
+                        "profile_pic"  =>  URL::to('/').'/uploads/user/' . $item->user->profile_pic,
+                        'lat'           => $this->nulltoBlank($item->user->lat),
+                        'long'           => $this->nulltoBlank($item->user->long),
+                        "start_time"    =>  $this->nulltoBlank($item->start_time),
+                        "end_time"      =>  $this->nulltoBlank($item->end_time),
+                        'providers'     => $providers
+                    ];
+                }
             }
         }
 
