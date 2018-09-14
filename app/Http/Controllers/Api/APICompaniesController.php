@@ -574,7 +574,8 @@ class APICompaniesController extends BaseApiController
                 $q->whereIn('provider_id', $providerIds);
             })->with([
             'company_all_providers','company_all_providers.provider.user',
-            'company_providers', 'company_providers.provider', 
+            'company_providers', 'company_providers.provider',
+            'company_providers.provider.services.service',  
             'company_services', 'company_testimonials', 
             'company_services', 'company_services.service'
         ])->get();
@@ -584,7 +585,7 @@ class APICompaniesController extends BaseApiController
 
         if(isset($items) && count($items))
         {
-            $itemsOutput = $this->companiesTransformer->companyTranformWithProviders($items);
+            $itemsOutput = $this->companiesTransformer->companyTranformFilterWithProviders($items);
 
             return $this->successResponse($itemsOutput);
         }

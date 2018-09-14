@@ -177,6 +177,62 @@ class CompaniesTransformer extends Transformer
         return $response; 
     }
 
+    public function companyTranformFilterWithProviders($items)
+    {
+        $response = [];
+
+        if(isset($items) && count($items))
+        {
+            foreach($items as $item)
+            {
+                $providers  = [];
+                $item       = (object)$item;
+
+                if(isset($item->company_providers) && count($item->company_providers))
+                {
+                    foreach($item->company_providers as $provider)
+                    {
+                        $providerServices = [];
+                        if(isset($provider->provider->services))
+                        {
+                            foreach($provider->provider->services as $service)
+                            {
+                                $providerServices[] = [
+                                    'service_id' => (int) $service->service_id,
+                                    'title'         => $service->service->title,
+                                ];
+                            }
+                        }
+
+                        $providers[] = [
+                            'provider_id'           => $provider->provider_id,
+                            'name'                  => $provider->provider->user->name,
+                            'services'              => $providerServices,
+                            'profile_pic'           => URL::to('/').'/uploads/user/' . $provider->provider->user->profile_pic, 
+                        ];
+                    }
+                }
+
+                if(isset($providers) && count($providers))
+                {
+                    $response[] = [
+                        "company_id"    => (int) $item->id,
+                        "company_name"  =>  $this->nulltoBlank($item->company_name),
+                        "profile_pic"  =>  URL::to('/').'/uploads/user/' . $item->user->profile_pic,
+                        'lat'           => $this->nulltoBlank($item->user->lat),
+                        'long'           => $this->nulltoBlank($item->user->long),
+                        "start_time"    =>  $this->nulltoBlank($item->start_time),
+                        "end_time"      =>  $this->nulltoBlank($item->end_time),
+                        'providers'     => $providers
+                    ];
+                }
+            }
+        }
+
+        return $response; 
+    }
+
+
     public function singleCompanyTranformWithProviders($items)
     {
         $response = [];
