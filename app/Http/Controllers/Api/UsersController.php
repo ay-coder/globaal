@@ -767,8 +767,8 @@ class UsersController extends BaseApiController
         foreach($exps as $exp)
         {
             $expData[] = [
-                'id'            => $exp->id,
-                'exp'  => $exp->level_of_experience,
+                'id'    => (int) $exp->id,
+                'exp'   => $exp->level_of_experience,
             ];
         }
         

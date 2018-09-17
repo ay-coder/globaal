@@ -56,7 +56,7 @@ class CompaniesTransformer extends Transformer
                 $providers[] = [
                     'provider_id'           => (int) $provider->provider_id,
                     'is_connected'          => $isConnected,
-                    'name'                  => $provider->provider->user->name,
+                    'name'                  => isset($provider->provider) ? $provider->provider->user->name : '',
                     'profile_pic'           => URL::to('/').'/uploads/user/' . $provider->provider->user->profile_pic, 
                 ];
             }
@@ -223,6 +223,7 @@ class CompaniesTransformer extends Transformer
                         'long'           => $this->nulltoBlank($item->user->long),
                         "start_time"    =>  $this->nulltoBlank($item->start_time),
                         "end_time"      =>  $this->nulltoBlank($item->end_time),
+                        'distance'      => isset($item->distance) ? $item->distance : 0,
                         'providers'     => $providers
                     ];
                 }

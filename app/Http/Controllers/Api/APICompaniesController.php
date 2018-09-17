@@ -529,7 +529,10 @@ class APICompaniesController extends BaseApiController
 
         $query      = $this->providerRepository->model->whereHas('services', function($q) use($serviceId)
         {
-            $q->whereIn('service_id', $serviceId);
+            if(count($serviceId))
+            {
+                $q->whereIn('service_id', $serviceId);
+            }
         });
 
         if($experience)
@@ -567,20 +570,40 @@ class APICompaniesController extends BaseApiController
             return $item;
         });*/
 
+        if($lat && $long)
+        {
+            $distance   = DB::select("SELECT id, ( 6371 * acos( cos( radians($lat) ) * cos( radians( `lat` ) ) * cos( radians( `long` ) - radians($long
+                ) ) + sin( radians($lat) ) * sin( radians( `lat` ) ) ) ) AS distance
+            FROM users
+            where user_type = 1
+            ORDER BY distance ASC");
 
-        //$items      = $items->sortBy('distance');
+            $distance = collect($distance);
+        }
         $items  = $this->repository->model->whereHas('company_all_providers', function($q) use($providerIds)
             {
                 $q->whereIn('provider_id', $providerIds);
             })->with([
+            'user',
             'company_all_providers','company_all_providers.provider.user',
             'company_providers', 'company_providers.provider',
             'company_providers.provider.services.service',  
             'company_services', 'company_testimonials', 
             'company_services', 'company_services.service'
-        ])->get();
+            ])->get();
 
+        $items = $items->map(function($item) use($distance)
+        {
+            $distanceUser   = $distance->where('id', $item->user->id);
+            $item->distance = 0;
 
+            if(isset($distanceUser) && isset($distanceUser->distance))
+            {
+                $item->distance = $distanceUser->distance;
+            }
+
+            return $item;
+        }); 
         
 
         if(isset($items) && count($items))
