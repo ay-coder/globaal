@@ -51,8 +51,8 @@ class APIProviderServicesController extends BaseApiController
     public function index(Request $request)
     {
         $userInfo   = $this->getAuthenticatedUser();
-        $providerId = $request->has('provider_id') ?  $request->get('provider_id') : $userInfo->id;
-        $provider   = Providers::with(['services'])->where('user_id', $providerId)->first();
+        $providerId = $request->has('provider_id') ?  $request->get('provider_id') : access()->getProviderId($userInfo->id);
+        $provider   = Providers::with(['services'])->where('id', $providerId)->first();
         $services   = Services::getAll()->toArray();
        
         if(isset($provider) && count($provider))

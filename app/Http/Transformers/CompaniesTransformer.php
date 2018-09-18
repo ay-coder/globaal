@@ -66,10 +66,13 @@ class CompaniesTransformer extends Transformer
         {
             foreach($companyInfo->company_services as $service)
             {
-                $services[] = [
-                    'service_id'    => (int) $service->service->id,
-                    'title'         => $service->service->title
-                ];
+                if(isset($service->service))
+                {
+                    $services[] = [
+                        'service_id'    => (int) $service->service->id,
+                        'title'         => $service->service->title
+                    ];
+                }
             }
         }
 
