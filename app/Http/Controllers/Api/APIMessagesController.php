@@ -55,7 +55,8 @@ class APIMessagesController extends BaseApiController
         }
         else
         {
-            $messages = $this->repository->getAllProviderMessages($userInfo->id);   
+            $providerId = access()->getProviderId($userInfo->id);
+            $messages = $this->repository->getAllProviderMessages($providerId);   
         }
 
         if($messages && count($messages))
@@ -111,12 +112,8 @@ class APIMessagesController extends BaseApiController
 
         if($model)
         {
-            $responseData = $this->messagesTransformer->transform($model);
-
-            return response()->json([
-                    'message'   => 'Messages is Created Successfully',
-                    'status'    => true,
-                    ], 200);
+            $responseData = $this->messagesTransformer->singleMessageTranform($model);
+            return $this->successResponse($responseData);
         }
 
         return $this->setStatusCode(400)->failureResponse([

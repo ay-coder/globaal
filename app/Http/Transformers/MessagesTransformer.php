@@ -52,4 +52,31 @@ class MessagesTransformer extends Transformer
 
         return $response;
     }
+
+    public function singleMessageTranform($item)
+    {
+        $response = [];
+
+        if($item)   
+        {
+            $currentUserId = access()->user()->id;
+            
+            $isRead     = $currentUserId == $item->user_id ? 1 : $item->is_read;
+            $response = [
+                'message_id'    => (int) $item->id,
+                'user_id'       => (int) $item->user_id,
+                'provider_id'   => (int) $item->provider_id,
+                'patient_id'    => (int) $item->patient_id,
+                'message'       => $item->message,
+                'provider_name' => $item->provider->name,
+                'provider_pic'  => URL::to('/').'/uploads/user/' . $item->provider->profile_pic,
+                'patient_name'  => $item->patient->name,
+                'patient_pic'   => URL::to('/').'/uploads/user/' . $item->patient->profile_pic,
+                'is_read'       => $isRead,
+                'created_at'    => date('Y-m-d H:i:s', strtotime($item->created_at))
+            ];
+        }
+
+        return $response;
+    }
 }
