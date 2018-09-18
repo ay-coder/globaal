@@ -517,6 +517,7 @@ class APIProvidersController extends BaseApiController
     public function filter(Request $request)
     {
         $serviceId  = $request->has('services') ? explode(',', $request->get('services')) : [];
+        $keyword    = $request->has('keyword') ? $request->get('keyword') : false;
         $experience = $request->has('experience') ? explode(',', $request->get('experience')) : false;
         $distance   = [];
         $lat        = $request->has('lat') ? $request->get('lat') : false;
@@ -530,6 +531,14 @@ class APIProvidersController extends BaseApiController
         if($experience)
         {
             $query->whereIn('level_of_experience',$experience);
+        }
+
+        if($keyword)
+        {
+            $query->whereHas('user', function($q) use($keyword)
+            {   
+                $q->where('name', 'LIKE', "%$keyword%");
+            });
         }
 
         if($lat && $long)
