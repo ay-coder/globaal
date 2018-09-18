@@ -594,12 +594,15 @@ class APICompaniesController extends BaseApiController
 
         $items = $items->map(function($item) use($distance)
         {
-            $distanceUser   = $distance->where('id', $item->user->id);
             $item->distance = 0;
 
-            if(isset($distanceUser) && isset($distanceUser->distance))
+            if(isset($distance) && count($distance))
             {
-                $item->distance = $distanceUser->distance;
+                $distanceUser   = $distance->where('id', $item->user->id);
+                if(isset($distanceUser) && isset($distanceUser->distance))
+                {
+                    $item->distance = $distanceUser->distance;
+                }
             }
 
             return $item;
