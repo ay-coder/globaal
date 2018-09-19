@@ -51,14 +51,17 @@ class CompaniesTransformer extends Transformer
         {
             foreach($companyInfo->company_all_providers as $provider)
             {
-                $isConnected = $provider->accept_by_provider == 1 && $provider->accept_by_company == 1 ? 1 : 0;
+                if(isset($provider->provider))
+                {   
+                    $isConnected = $provider->accept_by_provider == 1 && $provider->accept_by_company == 1 ? 1 : 0;
 
-                $providers[] = [
-                    'provider_id'           => (int) $provider->provider_id,
-                    'is_connected'          => $isConnected,
-                    'name'                  => isset($provider->provider) ? $provider->provider->user->name : '',
-                    'profile_pic'           => URL::to('/').'/uploads/user/' . $provider->provider->user->profile_pic, 
-                ];
+                    $providers[] = [
+                        'provider_id'           => (int) $provider->provider_id,
+                        'is_connected'          => $isConnected,
+                        'name'                  => isset($provider->provider) ? $provider->provider->user->name : '',
+                        'profile_pic'           => URL::to('/').'/uploads/user/' . $provider->provider->user->profile_pic, 
+                    ];
+                }
             }
         }
 
@@ -94,6 +97,7 @@ class CompaniesTransformer extends Transformer
             $response = [
                 "company_id"    => (int) $companyInfo->id,
                 "company_name"  =>  $this->nulltoBlank($companyInfo->company_name),
+                'email'         => isset($companyInfo->user) ? $companyInfo->user->email : '',
                 "start_time"    =>  $this->nulltoBlank($companyInfo->start_time),
                 "end_time"      =>  $this->nulltoBlank($companyInfo->end_time),
                 'address'       => $this->nulltoBlank($companyInfo->user->address),
