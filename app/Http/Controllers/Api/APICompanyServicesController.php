@@ -52,9 +52,8 @@ class APICompanyServicesController extends BaseApiController
         if($request->has('company_id'))
         {  
             $allServices    = Services::pluck('title', 'id')->toArray();
-            $company        = Companies::where('user_id', $request->get('company_id'))->first();
-
-            $companyServices = $this->repository->model->where('company_id', $company->user_id)->get();
+            
+            $companyServices = $this->repository->model->where('company_id', $request->get('company_id'))->get();
 
             if(isset($companyServices))
             {

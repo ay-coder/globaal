@@ -67,6 +67,38 @@ class APISchedulesController extends BaseApiController
     }
 
     /**
+     * List of All Schedules
+     *
+     * @param Request $request
+     * @return json
+     */
+    public function filter(Request $request)
+    {
+        if($request->has('company_id') && $request->has('service_id'))
+        {
+            $items = $this->repository->model->with([
+                'provider', 'service', 'user', 'company', 'provider.user'
+            ])->where([
+                'service_id' => $request->get('service_id'),
+                'company_id' => $request->get('company_id')
+            ])->get();
+
+            if(isset($items) && count($items))
+            {
+                $itemsOutput = $this->schedulesTransformer->transformProviderSchedules($items);
+
+                return $this->successResponse($itemsOutput);
+            }
+        }
+       
+
+
+        return $this->setStatusCode(400)->failureResponse([
+            'message' => 'Unable to find Schedules!'
+            ], 'No Schedules Found !');
+    }
+
+    /**
      * Create
      *
      * @param Request $request

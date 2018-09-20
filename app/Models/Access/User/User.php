@@ -40,6 +40,8 @@ class User extends Authenticatable
         'user_type',
         'address',
         'birthdate',
+        'mobile',
+        'profile_pic',
         'city',
         'state',
         'zip',
