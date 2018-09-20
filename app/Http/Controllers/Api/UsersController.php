@@ -439,7 +439,7 @@ class UsersController extends BaseApiController
                 foreach($addServices as $service)
                 {
                     $providerServiceData[] = [
-                        'provider_id'   => $user['id'],
+                        'provider_id'   => $provider->id,
                         'service_id'    => $service
                     ];
                 }
@@ -454,6 +454,7 @@ class UsersController extends BaseApiController
                 {
                     $providerCompanyData[] = [
                         'provider_id'   => $user['id'],
+                        'accept_by_provider' => 1,
                         'company_id'    => $company
                     ];
                 }
