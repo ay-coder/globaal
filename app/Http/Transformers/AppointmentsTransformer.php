@@ -42,7 +42,7 @@ class AppointmentsTransformer extends Transformer
                     'service_title'     => isset($item->service) ? $item->service->title : '',
                     'provider_id'       => (int) $item->provider_id,
                     'provider_name'     => $item->provider->user->name,
-                    'provider_pic'      => URL::to('/').'/uploads/user/' . $item->provider->profile_pic, 
+                    'provider_pic'      => URL::to('/').'/uploads/user/' . $item->provider->user->profile_pic, 
                     'booking_date'      => date('Y-m-d', strtotime($item->booking_date)),
                     'start_time'        => $item->start_time,
                     'end_time'          => $item->end_time,
