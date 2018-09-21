@@ -90,6 +90,7 @@ class APIAppointmentsController extends BaseApiController
             'user_id'   => $userInfo->id,
         ])
         ->where('booking_date', '<', date('Y-m-d'))
+        ->orWhereIn('current_status', ['CANCELED'])
         ->limit($perPage)
         ->offset($offset)
         ->get();
