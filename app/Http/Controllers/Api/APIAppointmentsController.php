@@ -52,7 +52,7 @@ class APIAppointmentsController extends BaseApiController
         $perPage    = $request->get('per_page') ? $request->get('per_page') : 100;
         $offset     = $request->get('page') ? $request->get('page') : 0;
         $items      = $this->repository->model->with([
-            'service', 'user', 'provider', 'company', 'company.user'
+            'service', 'user', 'provider', 'provider.user', 'company', 'company.user'
         ])->where([
             'user_id' => $userInfo->id
         ])

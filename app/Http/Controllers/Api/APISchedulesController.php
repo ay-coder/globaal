@@ -49,7 +49,7 @@ class APISchedulesController extends BaseApiController
     public function index(Request $request)
     {
         $userInfo   = $this->getAuthenticatedUser();
-        $providerId = $request->has('provider_id') ? $request->get('provider_id') : $userInfo->id;
+        $providerId = $request->has('provider_id') ? $request->get('provider_id') : access()->getProviderId($userInfo->id);
         $items      = $this->repository->model->with([
             'provider', 'service', 'user', 'company', 'provider.user'
         ])->where('provider_id', $providerId)->get();

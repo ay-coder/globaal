@@ -3,7 +3,7 @@
 use App\Models\Access\User\User;
 use App\Models\Services\Services;
 use App\Models\Companies\Companies;
-
+use App\Models\Providers\Providers;
 
 trait Relationship
 {
@@ -14,7 +14,7 @@ trait Relationship
      */
     public function provider()
     {
-        return $this->belongsTo(User::class, 'provider_id');
+        return $this->belongsTo(Providers::class, 'provider_id');
     }
 
     /**

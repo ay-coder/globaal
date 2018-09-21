@@ -45,6 +45,8 @@ class SchedulesTransformer extends Transformer
                     'company_id'    => (int) $item->company_id,
                     'provider_name' => $item->provider->user->name,
                     'company_name'  => $item->company->company_name,
+                    'company_lat'   => (float) $item->company->lat,
+                    'company_long'  => (float) $item->company->long,
                     'service'       => $item->service->title,
                     'start_time'    => $item->start_time,
                     'end_time'      => $item->end_time,
