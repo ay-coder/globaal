@@ -338,7 +338,6 @@ class EloquentMessagesRepository extends DbRepository
     {
         if($userId)
         {
-            $providerId = access()->getProviderId($userId);
             $messages = $this->model->where([
                 'provider_id' => $providerId
             ])
