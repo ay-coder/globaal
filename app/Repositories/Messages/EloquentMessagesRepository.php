@@ -334,9 +334,9 @@ class EloquentMessagesRepository extends DbRepository
      * 
      * @var [type]
      */
-    public function getAllProviderMessages($userId = null)
+    public function getAllProviderMessages($providerId = null)
     {
-        if($userId)
+        if($providerId)
         {
             $messages = $this->model->where([
                 'provider_id' => $providerId
