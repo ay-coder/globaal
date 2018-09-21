@@ -76,12 +76,21 @@ class APISchedulesController extends BaseApiController
     {
         if($request->has('company_id') && $request->has('service_id'))
         {
-            $items = $this->repository->model->with([
-                'provider', 'service', 'user', 'company', 'provider.user'
-            ])->where([
+            $conditions = [
                 'service_id' => $request->get('service_id'),
                 'company_id' => $request->get('company_id')
-            ])->get();
+            ];
+
+            if($request->has('provider_id'))
+            {
+                $conditions = array_merge($conditions, [
+                    'provider_id' => $request->get('provider_id')
+                ]);
+            }
+
+            $items = $this->repository->model->with([
+                'provider', 'service', 'user', 'company', 'provider.user'
+            ])->where($conditions)->get();
 
             if(isset($items) && count($items))
             {
