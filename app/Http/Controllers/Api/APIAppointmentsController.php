@@ -91,7 +91,7 @@ class APIAppointmentsController extends BaseApiController
             'user_id'   => $userInfo->id,
         ])
         ->whereIn('current_status', ['CANCELED', 'COMPLETED'])
-        ->orderBy('booking_date')
+        ->orderBy('booking_date', 'DESC')
         ->limit($perPage)
         ->offset($offset)
         ->get();
