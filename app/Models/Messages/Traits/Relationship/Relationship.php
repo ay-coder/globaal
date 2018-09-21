@@ -1,6 +1,7 @@
 <?php namespace App\Models\Messages\Traits\Relationship;
 
 use App\Models\Access\User\User;
+use App\Models\Providers\Providers;
 
 trait Relationship
 {
@@ -21,6 +22,6 @@ trait Relationship
      */
     public function provider()
     {
-        return $this->belongsTo(User::class, 'provider_id');
+        return $this->belongsTo(Providers::class, 'provider_id');
     }
 }

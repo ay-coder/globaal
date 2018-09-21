@@ -303,7 +303,8 @@ class EloquentMessagesRepository extends DbRepository
             ])
             ->with([
                 'patient',
-                'provider'
+                'provider',
+                'provider.user'
             ])
             ->orderBy('id', 'desc')
             ->get();
@@ -337,12 +338,14 @@ class EloquentMessagesRepository extends DbRepository
     {
         if($userId)
         {
+            $providerId = access()->getProviderId($userId);
             $messages = $this->model->where([
-                'provider_id' => $userId
+                'provider_id' => $providerId
             ])
             ->with([
                 'patient',
-                'provider'
+                'provider',
+                'provider.user'
             ])
             ->orderBy('id', 'desc')
             ->get();
