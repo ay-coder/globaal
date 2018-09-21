@@ -54,8 +54,9 @@ class APIAppointmentsController extends BaseApiController
         $items      = $this->repository->model->with([
             'service', 'user', 'provider', 'provider.user', 'company', 'company.user'
         ])->where([
-            'user_id' => $userInfo->id
+            'user_id' => $userInfo->id,
         ])
+        ->whereNotIn('current_status', ['CANCELED'])
         ->limit($perPage)
         ->offset($offset)
         ->get();
