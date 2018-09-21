@@ -57,7 +57,7 @@ class APIAppointmentsController extends BaseApiController
             'user_id' => $userInfo->id,
         ])
         ->whereNotIn('current_status', ['CANCELED'])
-        ->orderBy('booking_date', 'DESC')
+        ->orderBy('booking_date')
         ->limit($perPage)
         ->offset($offset)
         ->get();
@@ -91,7 +91,7 @@ class APIAppointmentsController extends BaseApiController
             'user_id'   => $userInfo->id,
         ])
         ->whereIn('current_status', ['CANCELED', 'COMPLETED'])
-        ->orderBy('booking_date', 'DESC')
+        ->orderBy('booking_date')
         ->limit($perPage)
         ->offset($offset)
         ->get();
