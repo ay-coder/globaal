@@ -106,7 +106,7 @@ class APIProvidersController extends BaseApiController
     public function show(Request $request)
     {
         $userInfo   = $this->getAuthenticatedUser();
-        $providerId = $request->has('provider_id') ? $request->get('provider_id') : $userInfo->id;
+        $providerId = $request->has('provider_id') ? $request->get('provider_id') : access()->getProviderId($userInfo->id);
 
         $item       = $this->repository->model->with(['companies', 'companies.company', 'services', 'services.service', 'user', 'leavelOfExperience', 'company', 'credentials'])
         ->where('id', $providerId)

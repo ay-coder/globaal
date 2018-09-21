@@ -453,9 +453,9 @@ class UsersController extends BaseApiController
                 foreach($addCompanies as $company)
                 {
                     $providerCompanyData[] = [
-                        'provider_id'   => $user['id'],
-                        'accept_by_provider' => 1,
-                        'company_id'    => $company
+                        'provider_id'           => $provider->id,
+                        'accept_by_provider'    => 1,
+                        'company_id'            => $company
                     ];
                 }
 
