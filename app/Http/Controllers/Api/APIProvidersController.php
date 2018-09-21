@@ -554,7 +554,8 @@ class APIProvidersController extends BaseApiController
         }
 
         $items = $query->with([
-            'companies', 'companies.company', 'services', 
+            'companies', 'companies.user',
+            'companies.company', 'services', 
             'services.service', 'user', 'leavelOfExperience', 'company'
         ])
         ->get();
