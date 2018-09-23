@@ -6,6 +6,8 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use App\Models\Providers\Providers;
 use App\Models\Companies\Companies;
 use App\Models\CompanyProviders\CompanyProviders;
+use App\Models\Notifications\Notifications;
+use App\Library\Push\PushNotification;
 
 /**
  * Class Access.
@@ -270,5 +272,45 @@ class Access
         }
 
         return $providerIds;
+    }
+
+    /**
+     * Add Notification
+     *
+     * @param array $data
+     */
+    public function addNotification($data = array())
+    {
+        if(isset($data) && count($data))
+        {
+            return Notifications::create($data);
+        }
+
+        return false;
+    }
+
+    /**
+     * Sent Push Notification
+     * 
+     * @param object $user
+     * @param array $payload
+     * @return bool
+     */
+    public function sentPushNotification($user = null, $payload = null)
+    {
+        if($user && $payload)
+        {
+            if(isset($user->device_token) && strlen($user->device_token) > 4 && $user->device_type == 1)
+            {
+                PushNotification::iOS($payload, $user->device_token);
+            }
+
+            if(isset($user->device_token) && strlen($user->device_token) > 4 && $user->device_type == 0)
+            {
+                PushNotification::android($payload, $user->device_token);
+            }
+        }
+
+        return true;
     }
 }

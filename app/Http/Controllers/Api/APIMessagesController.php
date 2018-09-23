@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use App\Http\Transformers\MessagesTransformer;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Repositories\Messages\EloquentMessagesRepository;
+use App\Models\Access\User\User;
+use App\Models\Providers\Providers;
 
 class APIMessagesController extends BaseApiController
 {
@@ -105,13 +107,47 @@ class APIMessagesController extends BaseApiController
      */
     public function create(Request $request)
     {
-        $input = $request->all();
-        $input = array_merge($input, ['user_id' => access()->user()->id]);
+        $input      = $request->all();
+        $userInfo   = $this->getAuthenticatedUser();
+        $providerId = $request->get('provider_id');
+        $patientId  = $request->get('patient_id');
+        $input      = array_merge($input, ['user_id' => access()->user()->id]);
 
+        
         $model = $this->repository->create($input);
 
         if($model)
         {
+            $text       = $userInfo->name . ' has messaged you';
+            $payload    = [
+                'mtitle'    => '',
+                'mdesc'     => $text,
+                'message_id' => $model->id,
+                'ntype'     => 'NEW_MESSAGE'
+            ];
+
+            if($patientId == access()->user()->id)
+            {
+                $provider = Providers::with('user')->where('id', $providerId)->first();
+                $user     = $provider->user;
+            }
+            else
+            {
+                $user = User::where('id', $patientId)->first();
+            }
+
+            $storeNotification = [
+                'user_id' => $user->id,
+                'title'   => $text,
+                'message_id' => $model->id
+            ];
+
+            // Add Notification
+            access()->addNotification($storeNotification;
+
+            // Push Notification
+            access()->sentPushNotification($user, $payload);
+
             $responseData = $this->messagesTransformer->singleMessageTranform($model);
             return $this->successResponse($responseData);
         }
