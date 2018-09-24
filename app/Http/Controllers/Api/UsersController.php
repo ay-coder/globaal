@@ -209,8 +209,13 @@ class UsersController extends BaseApiController
 
         $repository = new UserRepository;
         $input      = $request->all();
-        $input      = array_merge($input, ['profile_pic' => 'default.png']);
-        if($request->file('profile_image'))
+        $input      = array_merge($input, [
+            'profile_pic'   => 'default.png',
+            'user_type'     => 1
+        ]);
+
+
+        if($request->file('profile_pic'))
         {
             $imageName  = rand(11111, 99999) . '_user.' . $request->file('profile_image')->getClientOriginalExtension();
             if(strlen($request->file('profile_image')->getClientOriginalExtension()) > 0)

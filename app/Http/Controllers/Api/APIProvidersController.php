@@ -607,10 +607,13 @@ class APIProvidersController extends BaseApiController
         $lat        = $request->has('lat') ? $request->get('lat') : false;
         $long       = $request->has('long') ? $request->get('long') : false;
 
+        
         $query      = $this->repository->model->whereHas('services', function($q) use($serviceId)
         {
             $q->whereIn('service_id', $serviceId);
         });
+
+        
 
         if($companyId)
         {
@@ -618,11 +621,6 @@ class APIProvidersController extends BaseApiController
            {
                 $q->where('id', $companyId);
            }); 
-        }
-
-        if($experience)
-        {
-            $query->whereIn('level_of_experience',$experience);
         }
 
         if($keyword)
@@ -649,7 +647,7 @@ class APIProvidersController extends BaseApiController
             'services.service', 'user', 'leavelOfExperience', 'company'
         ])
         ->get();
-
+        
         $items = $items->map(function($item) use($distance)
         {
             if(isset($distance) && count($distance))

@@ -42,6 +42,8 @@ class User extends Authenticatable
         'birthdate',
         'mobile',
         'profile_pic',
+        'social_provider',
+        'social_token',
         'city',
         'state',
         'zip',
