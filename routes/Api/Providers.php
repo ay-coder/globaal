@@ -9,6 +9,8 @@ Route::group(['namespace' => 'Api'], function()
 
     Route::post('providers/filter', 'APIProvidersController@filter')->name('providers.filter');
 
+    Route::post('providers/filter-by-company', 'APIProvidersController@filterByCompany')->name('providers.filter');
+
     Route::post('providers/add-service', 'APIProvidersController@addService')->name('providers.add-service');
 
     Route::post('providers/remove-service', 'APIProvidersController@removeService')->name('providers.remove-service');

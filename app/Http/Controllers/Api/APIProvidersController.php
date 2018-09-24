@@ -590,4 +590,95 @@ class APIProvidersController extends BaseApiController
             'message' => 'Unable to find Providers!'
             ], 'No Providers Found !');
     }
+
+    /**
+     * List of All Providers
+     *
+     * @param Request $request
+     * @return json
+     */
+    public function filterByCompany(Request $request)
+    {
+        $serviceId  = $request->has('services') ? explode(',', $request->get('services')) : [];
+        $companyId  = $request->has('company_id') ? $request->get('company_id') : false;
+        $keyword    = $request->has('keyword') ? $request->get('keyword') : false;
+        $experience = $request->has('experience') ? explode(',', $request->get('experience')) : false;
+        $distance   = [];
+        $lat        = $request->has('lat') ? $request->get('lat') : false;
+        $long       = $request->has('long') ? $request->get('long') : false;
+
+        $query      = $this->repository->model->whereHas('services', function($q) use($serviceId)
+        {
+            $q->whereIn('service_id', $serviceId);
+        });
+
+        if($companyId)
+        {
+           $query->whereHas('companies', function($q) use($companyId)
+           {
+                $q->where('company_id', $companyId);
+           }); 
+        }
+
+        if($experience)
+        {
+            $query->whereIn('level_of_experience',$experience);
+        }
+
+        if($keyword)
+        {
+            $query->whereHas('user', function($q) use($keyword)
+            {   
+                $q->where('name', 'LIKE', "%$keyword%");
+            });
+        }
+
+        if($lat && $long)
+        {
+            $distance   = DB::select("SELECT id, ( 6371 * acos( cos( radians($lat) ) * cos( radians( `lat` ) ) * cos( radians( `long` ) - radians($long
+                ) ) + sin( radians($lat) ) * sin( radians( `lat` ) ) ) ) AS distance
+            FROM users
+            where user_type = 2
+            ORDER BY distance ASC");
+            $distance = collect($distance);
+        }
+
+        $items = $query->with([
+            'companies', 'companies.user',
+            'companies.company', 'services', 
+            'services.service', 'user', 'leavelOfExperience', 'company'
+        ])
+        ->get();
+
+        $items = $items->map(function($item) use($distance)
+        {
+            if(isset($distance) && count($distance))
+            {
+                $singleUser = $distance->where('id', $item->user_id);
+                
+                if(isset($singleUser) && isset($singleUser->distance))
+                {
+                    $item->distance = $singleUser->distance;
+                }
+            }
+
+            $item->distance = null;
+
+            return $item;
+        });
+
+
+        $items = $items->sortBy('distance');
+        
+        if(isset($items) && count($items))
+        {
+            $itemsOutput = $this->providersTransformer->transformProviders($items);
+
+            return $this->successResponse($itemsOutput);
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+            'message' => 'Unable to find Providers!'
+            ], 'No Providers Found !');
+    }
 }
