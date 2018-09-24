@@ -78,7 +78,7 @@ class ProvidersTransformer extends Transformer
                     'company_lat'   => isset($item->company->user) ? (float)  $item->company->user->lat : 0,
                     'company_long'   => isset($item->company->user) ? (float)  $item->company->user->long : 0,
                     'profile_pic'   => URL::to('/').'/uploads/user/' . $item->user->profile_pic, 
-                    'level_of_experience'   => $item->leavelOfExperience->level_of_experience,
+                    'level_of_experience'   => isset($item->leavelOfExperience) ? $item->leavelOfExperience->level_of_experience : '',
                     'services'      => $allServices,
                     'companies'     => $allCompanies,
                     'credentials'   => $allCredentials
