@@ -554,7 +554,7 @@ class APIProvidersController extends BaseApiController
         }
 
         $items = $query->with([
-            'companies', 'companies.user',
+            'companies', 
             'companies.company', 'services', 
             'services.service', 'user', 'leavelOfExperience', 'company'
         ])
@@ -616,7 +616,7 @@ class APIProvidersController extends BaseApiController
         {
            $query->whereHas('companies', function($q) use($companyId)
            {
-                $q->where('company_id', $companyId);
+                $q->where('id', $companyId);
            }); 
         }
 
@@ -644,7 +644,7 @@ class APIProvidersController extends BaseApiController
         }
 
         $items = $query->with([
-            'companies', 'companies.user',
+            'companies', 
             'companies.company', 'services', 
             'services.service', 'user', 'leavelOfExperience', 'company'
         ])
