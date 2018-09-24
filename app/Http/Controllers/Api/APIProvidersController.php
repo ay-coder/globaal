@@ -608,19 +608,15 @@ class APIProvidersController extends BaseApiController
         $long       = $request->has('long') ? $request->get('long') : false;
 
         
-        $query      = $this->repository->model->whereHas('services', function($q) use($serviceId)
-        {
-            $q->whereIn('service_id', $serviceId);
-        });
+        $query = $this->repository->model;
 
-        
-
-        if($companyId)
+        if(isset($serviceId) && count($serviceId))
         {
-           $query->whereHas('companies', function($q) use($companyId)
-           {
-                $q->where('id', $companyId);
-           }); 
+            $query = $query->whereHas('services', function($q) use($serviceId)
+            
+            {
+                $q->whereIn('service_id', $serviceId);
+            });
         }
 
         if($keyword)
@@ -641,13 +637,22 @@ class APIProvidersController extends BaseApiController
             $distance = collect($distance);
         }
 
-        $items = $query->with([
+        $query = $query->with([
             'companies', 
             'companies.company', 'services', 
             'services.service', 'user', 'leavelOfExperience', 'company'
-        ])
-        ->get();
-        
+        ]);
+
+        if($companyId)
+        {
+            $query->whereHas('companies', function($q) use($companyId)
+            {
+                $q->where('company_id', $companyId);
+            }); 
+        }
+
+        $items = $query->get();
+
         $items = $items->map(function($item) use($distance)
         {
             if(isset($distance) && count($distance))
