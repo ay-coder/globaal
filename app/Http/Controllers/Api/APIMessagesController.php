@@ -143,7 +143,7 @@ class APIMessagesController extends BaseApiController
             ];
 
             // Add Notification
-            access()->addNotification($storeNotification;
+            access()->addNotification($storeNotification);
 
             // Push Notification
             access()->sentPushNotification($user, $payload);
