@@ -130,16 +130,15 @@ class UsersController extends BaseApiController
                 $user->save();
             }
 
-            if($request->file('profile_image'))
+            if($request->has('profile_pic'))
             {
-                $imageName  = rand(11111, 99999) . '_user.' . $request->file('profile_image')->getClientOriginalExtension();
-                if(strlen($request->file('profile_image')->getClientOriginalExtension()) > 0)
-                {
-                    $request->file('profile_image')->move(base_path() . '/public/uploads/user/', $imageName);
-                    $user = Auth::user();
-                    $user->profile_pic = $imageName;
-                    $user->save();
-                }
+                $imageName  = "user-".time().".png";
+                $path       = base_path() . '/public/uploads/user/' . $imageName;
+                Image::make(file_get_contents($request->get('profile_pic')))->save($path); 
+
+                $user = Auth::user();
+                $user->profile_pic = $imageName;
+                $user->save();
             }
 
             $user       = Auth::user()->toArray();
