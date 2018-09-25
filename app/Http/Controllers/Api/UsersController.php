@@ -138,8 +138,7 @@ class UsersController extends BaseApiController
 
                 $imageName  = "user-".time().".png";
                 $path       = base_path() . '/public/uploads/user/' . $imageName;
-                $tempImg    = str_replace('data:image/png;base64,', '', $request->get('profile_pic'));
-                Image::make(file_get_contents($tempImg))->save($path);   
+                Image::make($request->get('profile_pic'))->save($path);   
                 $user = Auth::user();
                 $user->profile_pic = $imageName;
                 $user->save();
