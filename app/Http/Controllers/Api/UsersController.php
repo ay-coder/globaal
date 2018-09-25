@@ -30,6 +30,7 @@ use App\Models\Experiences\Experiences;
 use App\Models\ProviderTypes\ProviderTypes;
 use App\Models\MasterCategories\MasterCategories;
 use App\Models\CompanyServices\CompanyServices;
+use Image;
 
 class UsersController extends BaseApiController
 {
@@ -215,14 +216,12 @@ class UsersController extends BaseApiController
         ]);
 
 
-        if($request->file('profile_pic'))
+        if($request->has('profile_pic'))
         {
-            $imageName  = rand(11111, 99999) . '_user.' . $request->file('profile_image')->getClientOriginalExtension();
-            if(strlen($request->file('profile_image')->getClientOriginalExtension()) > 0)
-            {
-                $request->file('profile_image')->move(base_path() . '/public/uploads/user/', $imageName);
-                $input = array_merge($input, ['profile_pic' => $imageName]);
-            }
+            $imageName  = "user-".time().".png";
+            $path       = base_path() . '/public/uploads/user/' . $imageName;
+            Image::make(file_get_contents($request->get('profile_pic')))->save($path); 
+            $input = array_merge($input, ['profile_pic' => $imageName]);
         }
        
         $user = $repository->createSocialUserStub($input);
