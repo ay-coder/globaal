@@ -333,6 +333,31 @@ class APIProvidersController extends BaseApiController
 
                     if($request->save())
                     {
+                        $companyInfo = Companies::where('id', $request->company_id)->with('user')->first();
+
+                        $text       = $userInfo->name . ' has accepted your request';
+                        $payload    = [
+                                'mtitle'        => '',
+                                'mdesc'         => $text,
+                                'provider_id'   => $providerId,
+                                'company_id'    => $request->company_id,
+                                'ntype'         => 'PROVIDER_ACCEPT_REQUEST'
+                        ];
+
+                        
+                        $storeNotification = [
+                            'user_id'       => $userInfo->id,
+                            'title'         => $text,
+                            'company_id'    => $request->company_id,
+                            'provider_id'   => $providerId
+                        ];
+
+                        // Add Notification
+                        access()->addNotification($storeNotification);
+
+                        // Push Notification
+                        access()->sentPushNotification($companyInfo->user, $payload);
+
                         return $this->successResponse(['message' => 'Accepted Request Successfully!'], 'Accepted Request Successfully');
                     }
                 }

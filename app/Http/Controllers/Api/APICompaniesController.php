@@ -327,6 +327,32 @@ class APICompaniesController extends BaseApiController
 
                 if($status)
                 {
+
+                    $text       = $userInfo->company->company_name . " has requested to add you to it's provider list";
+
+                    $provider   = Providers::with('user')->where('id', $request->get('provider_id')->first();
+                    $payload    = [
+                            'mtitle'        => '',
+                            'mdesc'         => $text,
+                            'provider_id'   => $request->get('provider_id'),
+                            'company_id'    => $companyId,
+                            'ntype'         => 'COMPANY_CREATE_REQUEST'
+                    ];
+
+                    
+                    $storeNotification = [
+                        'user_id'       => $provider->user->id,
+                        'title'         => $text,
+                        'company_id'    => $companyId,
+                        'provider_id'   => $request->get('provider_id')
+                    ];
+
+                    // Add Notification
+                    access()->addNotification($storeNotification);
+
+                    // Push Notification
+                    access()->sentPushNotification($provider->user, $payload);
+
                     $message = [
                         'message' => 'Requeset sent to Provider successfully.'
                     ];
@@ -441,8 +467,34 @@ class APICompaniesController extends BaseApiController
             {   
                 $request->accept_by_company = 1;
 
+
+
                 if($request->save())
                 {
+                    $text       = $userInfo->name . ' has accepted your request';
+                    $provider   = Providers::with('user')->where('id', $request->provider_id)->first();
+                    $payload    = [
+                            'mtitle'        => '',
+                            'mdesc'         => $text,
+                            'provider_id'   => $request->provider_id,
+                            'company_id'    => $userInfo->company->id,
+                            'ntype'         => 'COMPANY_ACCEPT_REQUEST'
+                    ];
+
+                    
+                    $storeNotification = [
+                        'user_id'       => $provider->user->id,
+                        'title'         => $text,
+                        'company_id'    => $userInfo->company->id,
+                        'provider_id'   => $request->provider_id
+                    ];
+
+                    // Add Notification
+                    access()->addNotification($storeNotification);
+
+                    // Push Notification
+                    access()->sentPushNotification($provider->user, $payload);
+
                     return $this->successResponse(['message' => 'Accepted Request Successfully!'], 'Accepted Request Successfully');
                 }
             }
