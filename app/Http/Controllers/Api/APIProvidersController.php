@@ -398,6 +398,8 @@ class APIProvidersController extends BaseApiController
                $providerInfo = $this->repository->model->with('all_companies')
                ->where('id', $providerId)->first();
 
+               $companyInfo = Companies::where('id', $request->get('company_id'))->with('user')->first();
+
                if(isset($providerInfo))
                {    
                     $isExist = $providerInfo->all_companies->where('company_id', $request->get('company_id'));
@@ -417,6 +419,30 @@ class APIProvidersController extends BaseApiController
 
                     if($status)
                     {
+                        $text       = $userInfo->name . ' has requested to add him to your provider list';
+                        $payload    = [
+                                'mtitle'        => '',
+                                'mdesc'         => $text,
+                                'provider_id'   => $providerId,
+                                'company_id'    => $request->get('company_id'),
+                                'ntype'         => 'PROVIDER_REQUEST'
+                        ];
+
+                        
+                        $storeNotification = [
+                            'user_id'       => $companyInfo->user->id,
+                            'title'         => $text,
+                            'company_id'    => $request->get('company_id'),
+                            'provider_id'   => $providerId
+                        ];
+
+                        // Add Notification
+                        access()->addNotification($storeNotification);
+
+                        // Push Notification
+                        access()->sentPushNotification($companyInfo->user, $payload);
+
+
                         $message = [
                             'message' => 'Requeset sent to Company successfully.'
                         ];

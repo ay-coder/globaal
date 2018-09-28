@@ -120,10 +120,12 @@ class APIMessagesController extends BaseApiController
         {
             $text       = $userInfo->name . ' has messaged you';
             $payload    = [
-                'mtitle'    => '',
-                'mdesc'     => $text,
-                'message_id' => $model->id,
-                'ntype'     => 'NEW_MESSAGE'
+                    'mtitle'        => '',
+                    'mdesc'         => $text,
+                    'message_id'    => $model->id,
+                    'provider_id'   => $providerId,
+                    'patient_id'    => $patientId,
+                    'ntype'         => 'NEW_MESSAGE'
             ];
 
             if($patientId == access()->user()->id)
