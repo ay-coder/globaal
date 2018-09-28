@@ -782,8 +782,8 @@ class UsersController extends BaseApiController
 
         $successResponse = [
             'support_number'        => '110001010',
-            'privacy_policy_url'    => 'https://www.google.co.in/',
-            'terms_conditions_url'  => 'https://www.google.co.in/',
+            'privacy_policy_url'    => 'https://app.termly.io/document/privacy-policy/12a9dc1f-e7da-42ec-a3b5-1b5dcddfa86e',
+            'terms_conditions_url'  => 'https://app.termly.io/document/terms-of-use-for-website/c630f9ff-3c7c-4b43-9585-a879bd7348eb',
             'about_us_url'          => 'https://www.google.co.in/',
             'min_distance'          => 0,
             'max_distance'          => 10,
