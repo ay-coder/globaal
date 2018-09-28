@@ -40,10 +40,10 @@ class MessagesTransformer extends Transformer
                     'provider_id'   => (int) $item->provider_id,
                     'patient_id'    => (int) $item->patient_id,
                     'message'       => $item->message,
-                    'provider_name' => $item->provider->user->name,
-                    'provider_pic'  => URL::to('/').'/uploads/user/' . $item->provider->user->profile_pic,
-                    'patient_name'  => $item->patient->name,
-                    'patient_pic'   => URL::to('/').'/uploads/user/' . $item->patient->profile_pic,
+                    'provider_name' => isset($item->provider) ? $item->provider->user->name : '',
+                    'provider_pic'  => isset($item->provider) ? URL::to('/').'/uploads/user/' . $item->provider->user->profile_pic : '',
+                    'patient_name'  => isset($item->patient) ? $item->patient->name : '',
+                    'patient_pic'   => isset($item->patient) ? URL::to('/').'/uploads/user/' . $item->patient->profile_pic : '',
                     'is_read'       => $isRead,
                     'created_at'    => date('Y-m-d H:i:s', strtotime($item->created_at))
                 ];
