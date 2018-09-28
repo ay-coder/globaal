@@ -307,7 +307,7 @@ class Access
 
             if(isset($user->device_token) && strlen($user->device_token) > 4 && $user->device_type == 0)
             {
-                PushNotification::android($payload, $user->device_token);
+                /*PushNotification::android($payload, $user->device_token);*/
             }
         }
 
