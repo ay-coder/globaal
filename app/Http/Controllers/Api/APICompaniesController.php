@@ -330,7 +330,7 @@ class APICompaniesController extends BaseApiController
 
                     $text       = $userInfo->company->company_name . " has requested to add you to it's provider list";
 
-                    $provider   = Providers::with('user')->where('id', $request->get('provider_id')->first();
+                    $provider   = Providers::with('user')->where('id', $request->get('provider_id'))->first();
                     $payload    = [
                             'mtitle'        => '',
                             'mdesc'         => $text,
