@@ -102,7 +102,7 @@ class PushNotification
 		$ctx = stream_context_create();
 
 		// ck.pem is your certificate file
-		stream_context_set_option($ctx, 'ssl', 'local_cert', public_path().DIRECTORY_SEPARATOR.'pushcert.pem');
+		stream_context_set_option($ctx, 'ssl', 'local_cert', public_path().DIRECTORY_SEPARATOR.'apns_cert_age.pem');
 		stream_context_set_option($ctx, 'ssl', 'passphrase', self::$passphrase);
 
 		//LIVE URL - gateway.push.apple.com
