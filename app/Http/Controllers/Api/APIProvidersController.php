@@ -349,7 +349,8 @@ class APIProvidersController extends BaseApiController
                             'user_id'       => $userInfo->id,
                             'title'         => $text,
                             'company_id'    => $request->company_id,
-                            'provider_id'   => $providerId
+                            'provider_id'   => $providerId,
+                            'notification_type' => 'PROVIDER_ACCEPT_REQUEST'
                         ];
 
                         // Add Notification
@@ -458,7 +459,8 @@ class APIProvidersController extends BaseApiController
                             'user_id'       => $companyInfo->user->id,
                             'title'         => $text,
                             'company_id'    => $request->get('company_id'),
-                            'provider_id'   => $providerId
+                            'provider_id'   => $providerId,
+                            'notification_type' => 'PROVIDER_REQUEST'
                         ];
 
                         // Add Notification

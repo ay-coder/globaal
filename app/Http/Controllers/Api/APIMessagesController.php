@@ -139,9 +139,10 @@ class APIMessagesController extends BaseApiController
             }
 
             $storeNotification = [
-                'user_id' => $user->id,
-                'title'   => $text,
-                'message_id' => $model->id
+                'user_id'           => $user->id,
+                'title'             => $text,
+                'message_id'        => $model->id,
+                'notification_type' => 'NEW_MESSAGE'
             ];
 
             // Add Notification

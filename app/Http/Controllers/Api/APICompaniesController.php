@@ -344,7 +344,8 @@ class APICompaniesController extends BaseApiController
                         'user_id'       => $provider->user->id,
                         'title'         => $text,
                         'company_id'    => $companyId,
-                        'provider_id'   => $request->get('provider_id')
+                        'provider_id'   => $request->get('provider_id'),
+                        'notification_type' => 'COMPANY_CREATE_REQUEST'
                     ];
 
                     // Add Notification
@@ -486,7 +487,8 @@ class APICompaniesController extends BaseApiController
                         'user_id'       => $provider->user->id,
                         'title'         => $text,
                         'company_id'    => $userInfo->company->id,
-                        'provider_id'   => $request->provider_id
+                        'provider_id'   => $request->provider_id,
+                        'notification_type' => 'COMPANY_ACCEPT_REQUEST'
                     ];
 
                     // Add Notification

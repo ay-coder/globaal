@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Transformers\AppointmentsTransformer;
 use App\Http\Controllers\Api\BaseApiController;
+use App\Models\Access\User\User;
+use App\Models\Providers\Providers;
+use App\Models\Companies\Companies;
 use App\Repositories\Appointments\EloquentAppointmentsRepository;
 use DateTime;
 
@@ -137,7 +140,22 @@ class APIAppointmentsController extends BaseApiController
                     $startTime   = strtotime($date.$booking->start_time);
                     $actualStart = strtotime($date.$request->get('start_time'));
                     $actualEnd   = strtotime($date.$request->get('end_time'));
-                    if($startTime >= $actualStart && $startTime <= $actualEnd)
+
+                    $startTime = DateTime::createFromFormat('H:i', $request->get('start_time'))->format('H:i:s');
+                    $endTime = DateTime::createFromFormat('H:i', $request->get('end_time'))->format('H:i:s');
+
+                    $timeAllow = $this->repository->model->where([
+                        'provider_id'   => $request->get('provider_id'),
+                        'service_id'    => $request->get('service_id'),
+                        'company_id'    => $request->get('company_id'),
+                        'booking_date'  => $request->get('booking_date'),
+                    ])
+                    ->where('current_status', '!=', 'CANCELED')
+                    ->where('start_time', '>=', $startTime)
+                    ->where('end_time', '<=', $endTime)
+                    ->get();
+
+                    if(isset($timeAllow) && count($timeAllow))
                     {
                         return $this->setStatusCode(400)->failureResponse([
                             'reason' => 'Some one already booked this Schedule Please change booking time and try.'
@@ -158,6 +176,56 @@ class APIAppointmentsController extends BaseApiController
 
             if($status)
             {
+                $provider   = Providers::with('user')->where('id', $request->get('provider_id'))->first();
+                $companyInfo = Companies::where('id', $request->get('company_id'))->with('user')->first();
+                $text        = $userInfo->name . ' has booked an appointment for ' . $request->get('booking_date') . ' ' . $request->get('start_time') . ' To '. $request->get('end_time') . '.'; 
+
+                $companyText = $userInfo->name . ' has booked an appointment for ' . $request->get('booking_date') . ' ' .  $request->get('start_time') . ' To '.$request->get('end_time') . ' with '.  $provider->user->name;
+
+                $payload    = [
+                            'mtitle'        => '',
+                            'mdesc'         => $text,
+                            'provider_id'   => $request->get('provider_id'),
+                            'company_id'    => $request->get('company_id'),
+                            'ntype'         => 'NEW_APPOINTMENT_BOOKED'
+                ];
+
+                $companyPayload    = [
+                            'mtitle'        => '',
+                            'mdesc'         => $companyText,
+                            'provider_id'   => $request->get('provider_id'),
+                            'company_id'    => $request->get('company_id'),
+                            'ntype'         => 'NEW_APPOINTMENT_BOOKED'
+                ];
+
+                $storeNotification = [
+                    'user_id'       => $provider->user->id,
+                    'title'         => $text,
+                    'service_id'    => $request->get('service_id'),
+                    'provider_id'   => $request->get('provider_id'),
+                    'company_id'    => $request->get('company_id'),
+                    'patient_id'    => $userInfo->id,
+                    'notification_type' => 'NEW_APPOINTMENT_BOOKED'
+                ];
+
+                $storeCompanyNotification = [
+                    'user_id'       => $companyInfo->user->id,
+                    'title'         => $companyText,
+                    'provider_id'   => $request->get('provider_id'),
+                    'service_id'    => $request->get('service_id'),
+                    'company_id'    => $request->get('company_id'),
+                    'patient_id'    => $userInfo->id,
+                    'notification_type' => 'NEW_APPOINTMENT_BOOKED'
+                ];
+
+                // Add Notification
+                access()->addNotification($storeNotification);
+                access()->addNotification($storeCompanyNotification);
+
+                // Push Notification
+                access()->sentPushNotification($provider->user, $payload);
+                access()->sentPushNotification($companyInfo->user, $companyPayload);
+
                 $responseData = [
                     'message' => 'Appointments is Created Successfully'
                 ];

@@ -39,6 +39,7 @@ class NotificationsTransformer extends Transformer
                     'company_id'        => (int) $item->company_id,
                     'service_id'        => (int) $item->service_id,
                     'patient_name'      => $item->user->name,
+                    'notification_type' => isset($item->notification_type) ? $item->notification_type : '',
                     'provider_name'     => isset($item->provider) ? $item->provider->user->name : '',
                     'company_name'      => isset($item->company) ? $item->company->company_name : '',
                     'service'           => isset($item->service) ? $item->service->title : '',

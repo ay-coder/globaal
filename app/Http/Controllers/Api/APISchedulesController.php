@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use App\Http\Transformers\SchedulesTransformer;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Repositories\Schedules\EloquentSchedulesRepository;
+use App\Models\Providers\Providers;
+use App\Models\Companies\Companies;
 use DateTime;
 
 class APISchedulesController extends BaseApiController
@@ -134,20 +136,60 @@ class APISchedulesController extends BaseApiController
                 ->where('company_id', $request->get('company_id'))
                 ->first();
 
+
+
+
                 if(isset($oldSchedule) && isset($oldSchedule->start_time) && strlen(
                     $oldSchedule->start_time) > 2)
                 {
+                    /*$actualStart = DateTime::createFromFormat('H:i:s', $oldSchedule->start_time)->format('H:i:s');
 
-                    $date1 = DateTime::createFromFormat('H:i:s', $oldSchedule->start_time)->format('H:i:s');
-                    $date2 = DateTime::createFromFormat('H:i', $request->get('start_time'))->format('H:i');
-                    $date3 = DateTime::createFromFormat('H:i', $request->get('end_time'))->format('H:i:s');
+                    $actualEnd  = DateTime::createFromFormat('H:i:s', $oldSchedule->end_time)->format('H:i:s');*/
 
+
+                    $startTime = DateTime::createFromFormat('H:i', $request->get('start_time'))->format('H:i:s');
+                    $endTime = DateTime::createFromFormat('H:i', $request->get('end_time'))->format('H:i:s');
+
+
+                    $timeAllow = $this->repository->model->where([
+                        'provider_id'   => $request->get('provider_id'),
+                        'company_id'    => $request->get('company_id'),
+                    ])
+                    ->where('service_id',$request->get('service_id'))
+                    ->where('day_name', access()->getDay($day))
+                    ->where('provider_id', $request->get('provider_id'))
+                    ->where('company_id', $request->get('company_id'))
+                    ->where('start_time', '>=', $startTime)
+                    ->where('end_time', '<=', $endTime)
+                    ->get();
+
+                    if(isset($timeAllow) && count($timeAllow))
+                    {
+                        continue;
+                    }
+
+                    /*dd($timeAllow );
+
+                    dump($startTime, $actualStart, $actualEnd, $endTime);
+
+                    if($startTime >=  $actualStart && $startTime <= $actualEnd)
+                    {
+                        dump('Start time Between');
+                    }
+
+                    if($endTime >= $actualStart && $endTime <= $actualEnd)
+                    {
+                        dump('End time Between');
+                    }*/
+
+                    /*dump($date1, $date2, $date3);
+                    die('sop0');
                     if ($date1 >= $date2 && $date1 <= $date3)
                     {
                        continue;
-                    }
+                    }*/
 
-                    if(isset($oldSchedule->start_time) && strlen($oldSchedule->start_time) > 2)
+                    /*if(isset($oldSchedule->start_time) && strlen($oldSchedule->start_time) > 2)
                     {
                         $date4 = DateTime::createFromFormat('H:i:s', $oldSchedule->start_time)->format('H:i:s');
                         $date5 = DateTime::createFromFormat('H:i', $request->get('start_time'))->format('H:i:s');
@@ -157,7 +199,7 @@ class APISchedulesController extends BaseApiController
                         {
                            continue;
                         }
-                    }
+                    }*/
                 }
 
                 $createData[] = [
@@ -174,9 +216,38 @@ class APISchedulesController extends BaseApiController
             if(isset($createData) && count($createData))
             {
                 $status = $this->repository->model->insert($createData);
-
+                
                 if($status)
                 {
+                    $companyInfo = Companies::where('id', $request->get('company_id'))->with('user')->first();
+                    $provider   = Providers::with('user')->where('id', $request->get('provider_id'))->first();
+                    $text       = $companyInfo->company_name . ' has created a schedule for you'; 
+
+                    $payload    = [
+                                'mtitle'        => '',
+                                'mdesc'         => $text,
+                                'provider_id'   => $request->get('provider_id'),
+                                'company_id'    => $request->get('company_id'),
+                                'ntype'         => 'NEW_SCHEDULE_CREATED'
+                    ];
+
+                    $storeNotification = [
+                        'user_id'       => $provider->user->id,
+                        'title'         => $text,
+                        'service_id'    => $request->get('service_id'),
+                        'provider_id'   => $request->get('provider_id'),
+                        'company_id'    => $request->get('company_id'),
+                        'notification_type' => 'NEW_SCHEDULE_CREATED'
+                    ];
+
+                   
+
+                    // Add Notification
+                    access()->addNotification($storeNotification);
+                    
+                    // Push Notification
+                    access()->sentPushNotification($provider->user, $payload);
+                    
                     $message = ['message' => 'Schedule Added Successfully !'];
                     return $this->successResponse($message, 'Schedules is Created Successfully');
                 }
