@@ -137,23 +137,28 @@ class APIAppointmentsController extends BaseApiController
             {
                 foreach($bookings as $booking)
                 {
-                    $startTime   = strtotime($date.$booking->start_time);
+                    /*$startTime   = strtotime($date.$booking->start_time);
                     $actualStart = strtotime($date.$request->get('start_time'));
-                    $actualEnd   = strtotime($date.$request->get('end_time'));
+                    $actualEnd   = strtotime($date.$request->get('end_time'));*/
 
                     $startTime = DateTime::createFromFormat('H:i', $request->get('start_time'))->format('H:i:s');
                     $endTime = DateTime::createFromFormat('H:i', $request->get('end_time'))->format('H:i:s');
 
-                    $timeAllow = $this->repository->model->where([
+                    $query = $this->repository->model->where([
                         'provider_id'   => $request->get('provider_id'),
                         'service_id'    => $request->get('service_id'),
                         'company_id'    => $request->get('company_id'),
                         'booking_date'  => $request->get('booking_date'),
                     ])
-                    ->where('current_status', '!=', 'CANCELED')
-                    ->where('start_time', '>=', $startTime)
-                    ->where('end_time', '<=', $endTime)
-                    ->get();
+                    ->where('current_status', '!=', 'CANCELED');
+
+                    if($startTime)
+                    {
+                        $query->whereBetween('start_time',  [$startTime, $endTime])
+                        ->orWhereBetween('end_time',  [$startTime, $endTime]);
+                    }
+
+                    $timeAllow = $query->get();
 
                     if(isset($timeAllow) && count($timeAllow))
                     {
@@ -208,19 +213,24 @@ class APIAppointmentsController extends BaseApiController
                     'notification_type' => 'NEW_APPOINTMENT_BOOKED'
                 ];
 
-                $storeCompanyNotification = [
-                    'user_id'       => $companyInfo->user->id,
-                    'title'         => $companyText,
-                    'provider_id'   => $request->get('provider_id'),
-                    'service_id'    => $request->get('service_id'),
-                    'company_id'    => $request->get('company_id'),
-                    'patient_id'    => $userInfo->id,
-                    'notification_type' => 'NEW_APPOINTMENT_BOOKED'
-                ];
-
                 // Add Notification
                 access()->addNotification($storeNotification);
-                access()->addNotification($storeCompanyNotification);
+
+                if(isset($companyInfo->user))
+                {
+                    $storeCompanyNotification = [
+                        'user_id'       => $companyInfo->user->id,
+                        'title'         => $companyText,
+                        'provider_id'   => $request->get('provider_id'),
+                        'service_id'    => $request->get('service_id'),
+                        'company_id'    => $request->get('company_id'),
+                        'patient_id'    => $userInfo->id,
+                        'notification_type' => 'NEW_APPOINTMENT_BOOKED'
+                    ];
+                    access()->addNotification($storeCompanyNotification);
+                }
+
+                
 
                 // Push Notification
                 access()->sentPushNotification($provider->user, $payload);

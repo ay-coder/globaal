@@ -7,6 +7,7 @@ use App\Models\Experiences\Experiences;
 use App\Models\CompanyProviders\CompanyProviders;
 use App\Models\ProviderTypes\ProviderTypes;
 use App\Models\Credentials\Credentials;
+use App\Models\Schedules\Schedules;
 
 trait Relationship
 {
@@ -59,5 +60,10 @@ trait Relationship
     public function provider_type()
     {
         return $this->belongsTo(ProviderTypes::class, 'provider_type_id');
+    }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedules::class, 'provider_id');
     }
 }

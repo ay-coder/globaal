@@ -691,7 +691,7 @@ class APIProvidersController extends BaseApiController
         }
 
         $query = $query->with([
-            'companies', 
+            'companies', 'schedules',
             'companies.company', 'services', 
             'services.service', 'user', 'leavelOfExperience', 'company'
         ]);

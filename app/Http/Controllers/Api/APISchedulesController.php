@@ -124,6 +124,7 @@ class APISchedulesController extends BaseApiController
             $userInfo   = $this->getAuthenticatedUser();
             $input      = array_merge($input, ['user_id' => $userInfo->id]);
             $createData = [];
+            $skippDays  = [];
             $allSchedule = $this->repository->model->where([
                 'provider_id'   => $request->get('provider_id'),
                 'company_id'    => $request->get('company_id'),
@@ -136,70 +137,36 @@ class APISchedulesController extends BaseApiController
                 ->where('company_id', $request->get('company_id'))
                 ->first();
 
-
-
-
                 if(isset($oldSchedule) && isset($oldSchedule->start_time) && strlen(
                     $oldSchedule->start_time) > 2)
                 {
-                    /*$actualStart = DateTime::createFromFormat('H:i:s', $oldSchedule->start_time)->format('H:i:s');
-
-                    $actualEnd  = DateTime::createFromFormat('H:i:s', $oldSchedule->end_time)->format('H:i:s');*/
-
-
                     $startTime = DateTime::createFromFormat('H:i', $request->get('start_time'))->format('H:i:s');
                     $endTime = DateTime::createFromFormat('H:i', $request->get('end_time'))->format('H:i:s');
 
 
-                    $timeAllow = $this->repository->model->where([
+                    $query = $this->repository->model->where([
                         'provider_id'   => $request->get('provider_id'),
                         'company_id'    => $request->get('company_id'),
                     ])
                     ->where('service_id',$request->get('service_id'))
                     ->where('day_name', access()->getDay($day))
                     ->where('provider_id', $request->get('provider_id'))
-                    ->where('company_id', $request->get('company_id'))
-                    ->where('start_time', '>=', $startTime)
-                    ->where('end_time', '<=', $endTime)
-                    ->get();
+                    ->where('company_id', $request->get('company_id'));
+                    
+                    if($startTime)
+                    {
+                        $query->whereBetween('start_time',  [$startTime, $endTime])
+                        ->orWhereBetween('end_time',  [$startTime, $endTime]);
+                    }
+
+
+                    $timeAllow = $query->get();
 
                     if(isset($timeAllow) && count($timeAllow))
                     {
+                        $skippDays[] = access()->getDay($day);
                         continue;
                     }
-
-                    /*dd($timeAllow );
-
-                    dump($startTime, $actualStart, $actualEnd, $endTime);
-
-                    if($startTime >=  $actualStart && $startTime <= $actualEnd)
-                    {
-                        dump('Start time Between');
-                    }
-
-                    if($endTime >= $actualStart && $endTime <= $actualEnd)
-                    {
-                        dump('End time Between');
-                    }*/
-
-                    /*dump($date1, $date2, $date3);
-                    die('sop0');
-                    if ($date1 >= $date2 && $date1 <= $date3)
-                    {
-                       continue;
-                    }*/
-
-                    /*if(isset($oldSchedule->start_time) && strlen($oldSchedule->start_time) > 2)
-                    {
-                        $date4 = DateTime::createFromFormat('H:i:s', $oldSchedule->start_time)->format('H:i:s');
-                        $date5 = DateTime::createFromFormat('H:i', $request->get('start_time'))->format('H:i:s');
-                        $date6 = DateTime::createFromFormat('H:i', $request->get('end_time'))->format('H:i:s');
-                        
-                        if ($date4 >= $date5 && $date4 <= $date6)
-                        {
-                           continue;
-                        }
-                    }*/
                 }
 
                 $createData[] = [
@@ -247,8 +214,18 @@ class APISchedulesController extends BaseApiController
                     
                     // Push Notification
                     access()->sentPushNotification($provider->user, $payload);
-                    
-                    $message = ['message' => 'Schedule Added Successfully !'];
+                        
+
+                    $skipDaysMsg = '';
+                    if(count($skippDays))
+                    {
+                        $skipDaysMsg = implode(', ', $skippDays);
+                    }
+
+                    $message = [
+                        'message'   => 'Schedule Added Successfully !',
+                        'skippDays' => $skipDaysMsg
+                    ];
                     return $this->successResponse($message, 'Schedules is Created Successfully');
                 }
             }
