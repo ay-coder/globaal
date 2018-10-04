@@ -604,7 +604,7 @@ class APICompaniesController extends BaseApiController
                 ->orWhere('email', 'LIKE', "%$keyword%");
             });
 
-            $query->whereHas('companies', function($cq) use($keyword)
+            $query->whereHas('all_companies.company', function($cq) use($keyword)
             {   
                 $cq->where('company_name', 'LIKE', "%$keyword%");
             });
@@ -612,35 +612,8 @@ class APICompaniesController extends BaseApiController
         }
 
 
-       /* if($lat && $long)
-        {
-            $distance   = DB::select("SELECT id, ( 6371 * acos( cos( radians($lat) ) * cos( radians( `lat` ) ) * cos( radians( `long` ) - radians($long
-                ) ) + sin( radians($lat) ) * sin( radians( `lat` ) ) ) ) AS distance
-            FROM users
-            where user_type = 2
-            ORDER BY distance ASC");
-            $distance = collect($distance);
-        }*/
-
         $providerIds = $query->pluck('id')->toArray();
         
-
-        /*$items = $items->map(function($item) use($distance)
-        {
-            if(isset($distance) && count($distance))
-            {
-                $singleUser = $distance->where('id', $item->user_id);
-                
-                if(isset($singleUser) && isset($singleUser->distance))
-                {
-                    $item->distance = $singleUser->distance;
-                }
-            }
-
-            $item->distance = null;
-
-            return $item;
-        });*/
 
         if($lat && $long)
         {
