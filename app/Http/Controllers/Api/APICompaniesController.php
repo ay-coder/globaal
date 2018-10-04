@@ -599,8 +599,16 @@ class APICompaniesController extends BaseApiController
         {
             $query->whereHas('user', function($q) use($keyword)
             {   
-                $q->where('name', 'LIKE', "%$keyword%");
+                $q->where('name', 'LIKE', "%$keyword%")
+                ->orWhere('address', 'LIKE', "%$keyword%")
+                ->orWhere('email', 'LIKE', "%$keyword%");
             });
+
+            $query->whereHas('companies', function($cq) use($keyword)
+            {   
+                $cq->where('company_name', 'LIKE', "%$keyword%");
+            });
+
         }
 
 
