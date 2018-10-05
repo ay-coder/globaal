@@ -93,15 +93,18 @@ class APIMessagesController extends BaseApiController
             }
         }
 
-        if($request->has('patient_id'))
-        {
-            $chatUser = User::where('id', $request->get('patient_id'))->first();
-        }
-        else
+        $userInfo = $this->getAuthenticatedUser();
+
+        if($userInfo->id == $request->get('patient_id'))
         {
             $chatProvider = Providers::with('user')->where('id', $request->get('provider_id'))->first();   
             $chatUser     = $chatProvider->user;
         }
+        else
+        {
+            $chatUser = User::where('id', $request->get('patient_id'))->first();
+        }
+
         $chatMsg = 'Start a conversation with ' . $chatUser->name;
 
         

@@ -49,7 +49,7 @@ class APICredentialsController extends BaseApiController
     {
         $userInfo   = $this->getAuthenticatedUser();
         $providerId = access()->getProviderId($userInfo->id);
-        $items      = $this->repository->model->where('provider_id', $providerId)->get();
+        $items      = $this->repository->model->with(['provider', 'provider.user'])->where('provider_id', $providerId)->get();
 
         if(isset($items) && count($items))
         {
