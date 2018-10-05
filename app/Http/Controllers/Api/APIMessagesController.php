@@ -93,10 +93,21 @@ class APIMessagesController extends BaseApiController
             }
         }
 
+        if($request->has('patient_id'))
+        {
+            $chatUser = User::where('id', $request->get('patient_id'))->first();
+        }
+        else
+        {
+            $chatProvider = Providers::with('user')->where('id', $request->get('provider_id'))->first();   
+            $chatUser     = $chatProvider->user;
+        }
+        $chatMsg = 'Start a conversation with ' . $chatUser->name;
+
         
         return $this->setStatusCode(400)->failureResponse([
-            'message' => 'Unable to find Messages!'
-            ], 'No Messages Found !');
+            'message' => $chatMsg
+            ], $chatMsg);
     }
 
     /**
