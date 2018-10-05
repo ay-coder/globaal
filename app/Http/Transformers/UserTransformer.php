@@ -2,6 +2,7 @@
 
 namespace App\Http\Transformers;
 
+use App\Models\Companies\Companies;
 use App\Http\Transformers;
 use URL;
 
@@ -11,6 +12,12 @@ class UserTransformer extends Transformer
     {
         $providerId = access()->getProviderId($data->id);
         $companyId  = access()->getCompanyId($data->id);
+        $companyInfo = false;
+
+        if($companyId)
+        {
+            $companyInfo = Companies::where('id', $companyId)->first();
+        }
 
         return [
             'user_id'               => (int) $data->id,
@@ -24,6 +31,9 @@ class UserTransformer extends Transformer
             'device_token'          => $this->nulltoBlank($data->device_token),
             'device_type'           => isset($data->device_type) ? (int) $data->device_type : 0,
             'profile_pic'           => URL::to('/').'/uploads/user/' . $data->profile_pic, 
+            'company_name'          => (isset($companyInfo) && $companyInfo) ? $companyInfo->company_name : '',
+            'start_time'            => (isset($companyInfo) && $companyInfo) ? $companyInfo->start_time : '',
+            'end_time'              => (isset($companyInfo) && $companyInfo) ? $companyInfo->end_time : '',
             'address'               => $this->nulltoBlank($data->address),
             'city'                  => $this->nulltoBlank($data->city),
             'state'                 => $this->nulltoBlank($data->state),

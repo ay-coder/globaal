@@ -38,12 +38,15 @@ class CredentialsTransformer extends Transformer
             foreach($items as $item)
             {
 
-                $response[] = [
-                    'credential_id' => (int) $item->id,
-                    'title'         => $item->title,
-                    'provider_id'   => (int) $item->provider->id,
-                    'provider_name' => $item->provider->name
-                ];
+                if(isset($item->provider))
+                {
+                    $response[] = [
+                        'credential_id' => (int) $item->id,
+                        'title'         => $item->title,
+                        'provider_id'   => (int) $item->provider->id,
+                        'provider_name' => $item->provider->name
+                    ];
+                }
             }
         }
 
