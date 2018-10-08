@@ -611,17 +611,16 @@ class APICompaniesController extends BaseApiController
 
         }
 
-
         $providerIds = $query->pluck('id')->toArray();
-        
-
+            
         if($lat && $long)
         {
-            $distance   = DB::select("SELECT id, ( 6371 * acos( cos( radians($lat) ) * cos( radians( `lat` ) ) * cos( radians( `long` ) - radians($long
+            $sql        = "SELECT id, ( 6371 * acos( cos( radians($lat) ) * cos( radians( `lat` ) ) * cos( radians( `long` ) - radians($long
                 ) ) + sin( radians($lat) ) * sin( radians( `lat` ) ) ) ) AS distance
             FROM users
-            where user_type = 1
-            ORDER BY distance ASC");
+            /*where user_type = 1*/
+            ORDER BY distance ASC";
+            $distance   = DB::select($sql);
 
             $distance = collect($distance);
         }
@@ -643,7 +642,8 @@ class APICompaniesController extends BaseApiController
 
             if(isset($distance) && count($distance))
             {
-                $distanceUser   = $distance->where('id', $item->user->id);
+                $distanceUser   = $distance->where('id', $item->user->id)->first();
+
                 if(isset($distanceUser) && isset($distanceUser->distance))
                 {
                     $item->distance = $distanceUser->distance;
@@ -661,8 +661,6 @@ class APICompaniesController extends BaseApiController
             return $this->successResponse($itemsOutput);
         }
 
-
-       
 
         return $this->setStatusCode(400)->failureResponse([
             'message' => 'No Companies Found!'
