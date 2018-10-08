@@ -24,4 +24,9 @@ class FrontendController extends Controller
     {
         return view('frontend.macros');
     }
+
+    public function aboutUs()
+    {
+        return view('frontend.about-us');   
+    }
 }
