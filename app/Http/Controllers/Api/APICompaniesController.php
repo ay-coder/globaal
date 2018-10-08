@@ -646,7 +646,7 @@ class APICompaniesController extends BaseApiController
 
                 if(isset($distanceUser) && isset($distanceUser->distance))
                 {
-                    $item->distance = $distanceUser->distance;
+                    $item->distance = number_format($distanceUser->distance, 2);
                 }
             }
 
