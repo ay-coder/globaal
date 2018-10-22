@@ -2,6 +2,7 @@
 namespace App\Http\Transformers;
 
 use App\Http\Transformers;
+use URL;
 
 class CredentialsTransformer extends Transformer
 {
@@ -43,7 +44,8 @@ class CredentialsTransformer extends Transformer
                         'credential_id' => (int) $item->id,
                         'title'         => $item->title,
                         'provider_id'   => (int) $item->provider_id,
-                        'provider_name' => $item->provider->user->name
+                        'provider_name' => $item->provider->user->name,
+                        'image'         => isset($item->image) ? URL::to('/').'/uploads/credentials/'.$item->image : ''
                     ];
                 }
             }

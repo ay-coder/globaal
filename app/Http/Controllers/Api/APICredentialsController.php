@@ -75,6 +75,14 @@ class APICredentialsController extends BaseApiController
         $userInfo   = $this->getAuthenticatedUser();
         $providerId = access()->getProviderId($userInfo->id);
         $input      = array_merge($input, ['provider_id' => $providerId]);
+
+        if($request->file('image'))
+        {
+            $imageName  = rand(11111, 99999) . '_credential.' . $request->file('image')->getClientOriginalExtension();
+            $request->file('image')->move(base_path() . '/public/uploads/credentials/', $imageName);
+            $input = array_merge($input, ['image' => $imageName]);
+        }
+
         $model      = $this->repository->create($input);
 
         if($model)

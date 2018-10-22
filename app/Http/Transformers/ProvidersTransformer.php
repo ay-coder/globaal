@@ -64,6 +64,7 @@ class ProvidersTransformer extends Transformer
                     {
                         $allCredentials[] = [
                             'credential_id'     => (int) $credential->id,
+                            'image'             => isset($credential->image) ? URL::to('/').'/uploads/credentials/'.$credential->image : '',
                             'title'             => $credential->title
                         ];
                     }
@@ -133,6 +134,7 @@ class ProvidersTransformer extends Transformer
                 {
                     $allCredentials[] = [
                         'credential_id'     => (int) $credential->id,
+                        'image'             => isset($credential->image) ? URL::to('/').'/uploads/credentials/'.$credential->image : '',
                         'title'             => $credential->title
                     ];
                 }

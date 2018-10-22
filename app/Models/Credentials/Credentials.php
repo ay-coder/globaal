@@ -24,7 +24,7 @@ class Credentials extends BaseModel
      *
      */
     protected $fillable = [
-        "id", "provider_id", "title", "description", "status", "created_at", "updated_at", 
+        "id", "provider_id", "image", "title", "description", "status", "created_at", "updated_at", 
     ];
 
     /**
