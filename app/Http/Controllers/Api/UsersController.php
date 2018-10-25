@@ -613,6 +613,7 @@ class UsersController extends BaseApiController
         }
         
         $userInfo   = $this->getApiUserInfo();
+        $loginUser  = $this->getAuthenticatedUser();
         $repository = new UserRepository;
         $input      = $request->all();
         
@@ -642,7 +643,7 @@ class UsersController extends BaseApiController
             return $this->failureResponse($validator->messages(), $messageData);
         }
 
-        if($userInfo['user_type'] == 3)
+        if($loginUser->user_type == 3)
         {
             $companyInfo = [];
             if(isset($input['company_name']))
@@ -665,11 +666,11 @@ class UsersController extends BaseApiController
 
             if(count($companyInfo))
             {
-                Companies::where('user_id', $userInfo['userId'])->update($companyInfo);
+                Companies::where('user_id', $loginUser->id)->update($companyInfo);
             }
         }
 
-        if($userInfo['user_type'] == 2)
+        if($loginUser->user_type == 2)
         {
             $providerInfo = [];
             if(isset($input['provider_type_id']))
@@ -686,7 +687,7 @@ class UsersController extends BaseApiController
 
             if(count($providerInfo))
             {
-                Providers::where('user_id', $userInfo['userId'])->update($providerInfo);
+                Providers::where('user_id', $loginUser->id)->update($providerInfo);
             }
         }
 
