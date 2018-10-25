@@ -642,10 +642,61 @@ class UsersController extends BaseApiController
             return $this->failureResponse($validator->messages(), $messageData);
         }
 
+        if($userInfo['user_type'] == 3)
+        {
+            $companyInfo = [];
+            if(isset($input['company_name']))
+            {
+                $companyInfo = array_merge($companyInfo, ['company_name' => $input['company_name']]);
+                unset($input['company_name']);
+            }
+
+            if(isset($input['start_time']))
+            {
+                $companyInfo = array_merge($companyInfo, ['start_time' => $input['start_time']]);
+                unset($input['start_time']);
+            }
+
+            if(isset($input['end_time']))
+            {
+                $companyInfo = array_merge($companyInfo, ['end_time' => $input['end_time']]);
+                unset($input['end_time']);
+            }
+
+            if(count($companyInfo))
+            {
+                Companies::where('user_id', $userInfo['userId'])->update($companyInfo);
+            }
+        }
+
+        if($userInfo['user_type'] == 2)
+        {
+            $providerInfo = [];
+            if(isset($input['provider_type_id']))
+            {
+                $providerInfo = array_merge($providerInfo, ['provider_type_id' => $input['provider_type_id']]);
+                unset($input['provider_type_id']);
+            }
+
+            if(isset($input['level_of_experience']))
+            {
+                $providerInfo = array_merge($providerInfo, ['level_of_experience' => $input['level_of_experience']]);
+                unset($input['level_of_experience']);
+            }           
+
+            if(count($providerInfo))
+            {
+                Providers::where('user_id', $userInfo['userId'])->update($providerInfo);
+            }
+        }
+
         $status = $repository->updateUserStub($userInfo['userId'], $input);
 
         if($status)
         {
+
+            
+
             return $this->successResponse(['message' => 'Profile Updated Successfully!'], 'Profile Updated Successfully');
         }
 
