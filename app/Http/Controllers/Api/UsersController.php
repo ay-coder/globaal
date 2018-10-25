@@ -691,6 +691,12 @@ class UsersController extends BaseApiController
             }
         }
 
+        unset($input['company_name']);
+        unset($input['level_of_experience']);
+        unset($input['provider_type_id']);
+        unset($input['end_time']);
+        unset($input['start_time']);
+
         $status = $repository->updateUserStub($userInfo['userId'], $input);
 
         if($status)
