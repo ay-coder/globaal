@@ -230,7 +230,7 @@ class CompaniesTransformer extends Transformer
                         'long'           => (float)  $this->nulltoBlank($item->user->long),
                         "start_time"    =>  $this->nulltoBlank($item->start_time),
                         "end_time"      =>  $this->nulltoBlank($item->end_time),
-                        'distance'      => isset($item->distance) ? $item->distance : 0,
+                        'distance'      => isset($item->distance) ? (float) $item->distance : (float) 0.0,
                         'providers'     => $providers
                     ];
                 }
