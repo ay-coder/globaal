@@ -107,7 +107,7 @@ class TestimonialsTransformer extends Transformer
                     'name'          => $item->user->name,
                     'email'         => $item->user->email,
                     'provider_id'   => $item->provider_id,
-                    'provider_name' => $item->provider->name,
+                    'provider_name' => isset($item->provider) ? $item->provider->name : '',
                     'service_id'    => (int) $item->service_id,
                     'service_title' => isset($item->service) ? $item->service->title : '',
                     'company_id'    => 0,
