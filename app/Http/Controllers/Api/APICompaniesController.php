@@ -595,7 +595,7 @@ class APICompaniesController extends BaseApiController
             $query->whereIn('level_of_experience',$experience);
         }
 
-        if($keyword)
+        /*if($keyword)
         {
             $query->whereHas('user', function($q) use($keyword)
             {   
@@ -609,9 +609,10 @@ class APICompaniesController extends BaseApiController
                 $cq->where('company_name', 'LIKE', "%$keyword%");
             });
 
-        }
+        }*/
 
         $providerIds = $query->pluck('id')->toArray();
+        //dd($providerIds);
             
         if($lat && $long)
         {
@@ -624,7 +625,7 @@ class APICompaniesController extends BaseApiController
 
             $distance = collect($distance);
         }
-        $items  = $this->repository->model->whereHas('company_all_providers', function($q) use($providerIds)
+        $filterQuery = $this->repository->model->whereHas('company_all_providers', function($q) use($providerIds)
             {
                 $q->whereIn('provider_id', $providerIds);
             })->with([
@@ -634,7 +635,14 @@ class APICompaniesController extends BaseApiController
             'company_providers.provider.services.service',  
             'company_services', 'company_testimonials', 
             'company_services', 'company_services.service'
-            ])->get();
+            ]);
+            
+        if($keyword)
+        {
+            $filterQuery->where('company_name', 'LIKE', "%$keyword%");
+        }
+
+        $items  = $filterQuery->get();
 
         $items = $items->map(function($item) use($distance)
         {
