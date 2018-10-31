@@ -10,6 +10,7 @@ use App\Models\Services\Services;
 use App\Models\ProviderServices\ProviderServices;
 use App\Models\CompanyProviders\CompanyProviders;
 use App\Models\Companies\Companies;
+use App\Models\Testimonials\Testimonials;
 use DB;
 
 class APIProvidersController extends BaseApiController
@@ -108,13 +109,16 @@ class APIProvidersController extends BaseApiController
         $userInfo   = $this->getAuthenticatedUser();
         $providerId = $request->has('provider_id') ? $request->get('provider_id') : access()->getProviderId($userInfo->id);
 
-        $item       = $this->repository->model->with(['companies', 'companies.company', 'services', 'services.service', 'user', 'leavelOfExperience', 'company', 'credentials'])
+        $item       = $this->repository->model->with(['companies',  'companies.company', 'services', 'services.service', 'user', 'leavelOfExperience', 'company', 'credentials'])
         ->where('id', $providerId)
         ->first();
 
+
+        $testimonials = Testimonials::with('service')->where('provider_id', $providerId)->get();
+
         if(isset($item) && count($item))
         {
-            $itemsOutput = $this->providersTransformer->transformSingleProviders($item);
+            $itemsOutput = $this->providersTransformer->transformSingleProviders($item, $testimonials);
 
             return $this->successResponse($itemsOutput);
         }

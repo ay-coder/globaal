@@ -92,7 +92,7 @@ class ProvidersTransformer extends Transformer
         return $response;
     }
 
-    public function transformSingleProviders($item)
+    public function transformSingleProviders($item, $testimonials = array())
     {
         $response = [];
 
@@ -101,6 +101,22 @@ class ProvidersTransformer extends Transformer
             $allServices    = [];
             $allCompanies   = [];
             $allCredentials = [];
+            $allTestimonials = [];
+
+            if(isset($testimonials) && count($testimonials))
+            {
+                foreach($testimonials as $testimonial)
+                {
+                    $allTestimonials[] = [
+                        'service_id'    => (int) isset($testimonial->service_id) ? $testimonial->service_id : 0,
+                        'service_title' => isset($testimonial->service) ? $testimonial->service->title : '',
+                        'title'         => $testimonial->title,
+                        'description'         => $testimonial->description,
+                        'before_image'  =>  URL::to('/').'/uploads/testimonials/'.$testimonial->before_image,
+                        'after_image'   =>  URL::to('/').'/uploads/testimonials/'.$testimonial->after_image,
+                    ];
+                }
+            }
 
             if(isset($item->services) && count($item->services))
             {
@@ -152,7 +168,8 @@ class ProvidersTransformer extends Transformer
                 'level_of_experience'   => isset($item->leavelOfExperience) ? $item->leavelOfExperience->level_of_experience : '',
                 'services'      => $allServices,
                 'companies'     => $allCompanies,
-                'credentials'   => $allCredentials
+                'credentials'   => $allCredentials,
+                'testimonials'  => $allTestimonials
             ];
         }
 

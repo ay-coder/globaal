@@ -595,7 +595,7 @@ class APICompaniesController extends BaseApiController
             $query->whereIn('level_of_experience',$experience);
         }
 
-        /*if($keyword)
+        if($keyword)
         {
             $query->whereHas('user', function($q) use($keyword)
             {   
@@ -604,12 +604,12 @@ class APICompaniesController extends BaseApiController
                 ->orWhere('email', 'LIKE', "%$keyword%");
             });
 
-            $query->whereHas('all_companies.company', function($cq) use($keyword)
+            /*$query->whereHas('all_companies.company', function($cq) use($keyword)
             {   
                 $cq->where('company_name', 'LIKE', "%$keyword%");
-            });
+            });*/
 
-        }*/
+        }
 
         $providerIds = $query->pluck('id')->toArray();
         //dd($providerIds);

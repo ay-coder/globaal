@@ -8,6 +8,7 @@ use App\Models\CompanyProviders\CompanyProviders;
 use App\Models\ProviderTypes\ProviderTypes;
 use App\Models\Credentials\Credentials;
 use App\Models\Schedules\Schedules;
+use App\Models\Testimonials\Testimonials;
 
 trait Relationship
 {
@@ -61,6 +62,12 @@ trait Relationship
     {
         return $this->belongsTo(ProviderTypes::class, 'provider_type_id');
     }
+
+    public function provider_testimonials()
+    {
+        return $this->belongsTo(Testimonials::class, 'id', '');
+    }
+    
 
     public function schedules()
     {
