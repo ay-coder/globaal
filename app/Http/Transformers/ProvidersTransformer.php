@@ -35,6 +35,24 @@ class ProvidersTransformer extends Transformer
                 $allServices    = [];
                 $allCompanies   = [];
                 $allCredentials = [];
+                $isSchedule     = 0;
+
+                if(isset($item->schedules) && count($item->schedules))
+                {
+                    if(isset($item->company))
+                    {
+                        $isExist = $item->schedules->where('company_id', $item->company->id)->first();
+
+                        if(isset($isExist))
+                        {
+                            $isSchedule = 1;
+                        }
+                    }
+                    else
+                    {
+                       $isSchedule = 1;
+                    }
+                }
 
                 if(isset($item->services) && count($item->services))
                 {
@@ -79,7 +97,7 @@ class ProvidersTransformer extends Transformer
                     'company_lat'   => isset($item->company->user) ? (float)  $item->company->user->lat : 0,
                     'company_long'   => isset($item->company->user) ? (float)  $item->company->user->long : 0,
                     'profile_pic'   => URL::to('/').'/uploads/user/' . $item->user->profile_pic, 
-                    'is_schedule'   => isset($item->schedules) ? count($item->schedules) : 0,
+                    'is_schedule'   => $isSchedule,
                     'level_of_experience'   => isset($item->leavelOfExperience) ? $item->leavelOfExperience->level_of_experience : '',
                     'services'      => $allServices,
                     'companies'     => $allCompanies,

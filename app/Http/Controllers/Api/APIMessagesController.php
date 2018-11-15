@@ -105,12 +105,42 @@ class APIMessagesController extends BaseApiController
             $chatUser = User::where('id', $request->get('patient_id'))->first();
         }
 
-        $chatMsg = 'Start a conversation with ' . $chatUser->name;
+        if(isset($chatUser))
+        {
+            $chatMsg = 'Start a conversation with ' . $chatUser->name;
+                return $this->setStatusCode(400)->failureResponse([
+                    'message' => $chatMsg
+                    ], $chatMsg);
+        }
 
-        
+        if(!isset($chatUser) && $request->has('patient_id'))
+        {
+            $chatUser = User::where('id', $request->get('patient_id'))->first();
+
+            if(!isset($chatUser))
+            {
+                $chatMsg = 'Start a conversation with ' . $chatUser->name;
+                return $this->setStatusCode(400)->failureResponse([
+                    'message' => $chatMsg
+                    ], $chatMsg);
+            }
+        }
+
+        if(!isset($chatUser) && $request->has('provider_id'))
+        {
+            $chatProvider = Providers::with('user')->where('id', $request->get('provider_id'))->first();   
+            $chatUser     = $chatProvider->user;
+
+            $chatMsg = 'Start a conversation with ' . $chatUser->name;
+                return $this->setStatusCode(400)->failureResponse([
+                    'message' => $chatMsg
+                    ], $chatMsg);
+        }
+
         return $this->setStatusCode(400)->failureResponse([
-            'message' => $chatMsg
-            ], $chatMsg);
+                    'message' => 'Something went wrong!'
+                    ], "Something went wrong!");
+        
     }
 
     /**
