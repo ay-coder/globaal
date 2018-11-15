@@ -2,6 +2,7 @@
 
 @section('content')
     <div class="row">
+    <div class="col-sm-12">
        <p><strong>About A G E</strong></p>
        <p>Aesthetics Global Evolution, or A G E, is simply your home base for <em>all</em> things aesthetic.</p>
 <p>A G E is an aesthetic mobile application focused on giving all participants of this massive aesthetic global community equal opportunity for success. As the aesthetic industry multiplies exponentially and aesthetic practices and medical spas pop up like coffee shops, A G E wants to make sure there is one reliable source for all those involved: patients, providers, and companies. &nbsp;A G E brings together shared empowerment for every corner of this triangle.</p>
@@ -36,5 +37,6 @@
 </ul>
 <p>We are grateful to have you part of our aesthetic app community, and we say cheers to a life-long working relationship together because as we like to say, and hold strong to believe, it only gets better with A G E.</p>
 <p>* coming soon</p>
+	</div>
     </div>
 @endsection

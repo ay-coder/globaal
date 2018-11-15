@@ -52,13 +52,40 @@ class APIAppointmentsController extends BaseApiController
     public function index(Request $request)
     {
         $userInfo   = $this->getAuthenticatedUser();
+
+        $providerId = access()->getProviderId($userInfo->id);
+        $companyId  = access()->getCompanyId($userInfo->id);
+
+        $condition  = [];
+
+
+        if(!empty($providerId))
+        {
+            $condition  = [
+                'provider_id' => $providerId
+            ];
+        }
+
+        if(!empty($companyId))
+        {
+            $condition  = [
+                'company_id' => $companyId
+            ];
+        }
+
+        if(count($condition) == 0)
+        {
+            $condition  = [
+                'user_id' => $userInfo->id
+            ];
+        }
+
         $perPage    = $request->get('per_page') ? $request->get('per_page') : 100;
         $offset     = $request->get('page') ? $request->get('page') : 0;
         $items      = $this->repository->model->with([
             'service', 'user', 'provider', 'provider.user', 'company', 'company.user'
-        ])->where([
-            'user_id' => $userInfo->id,
-        ])
+        ])->where($condition)
+        ->whereDate('booking_date', '>', date('Y-m-d'))
         ->whereNotIn('current_status', ['CANCELED'])
         ->orderBy('booking_date')
         ->limit($perPage)
@@ -88,11 +115,36 @@ class APIAppointmentsController extends BaseApiController
         $userInfo   = $this->getAuthenticatedUser();
         $perPage    = $request->get('per_page') ? $request->get('per_page') : 100;
         $offset     = $request->get('page') ? $request->get('page') : 0;
+        $providerId = access()->getProviderId($userInfo->id);
+        $companyId  = access()->getCompanyId($userInfo->id);
+
+        $condition  = [];
+
+
+        if(!empty($providerId))
+        {
+            $condition  = [
+                'provider_id' => $providerId
+            ];
+        }
+
+        if(!empty($companyId))
+        {
+            $condition  = [
+                'company_id' => $companyId
+            ];
+        }
+
+        if(count($condition) == 0)
+        {
+            $condition  = [
+                'user_id' => $userInfo->id
+            ];
+        }
+
         $items      = $this->repository->model->with([
             'service', 'user', 'provider', 'company', 'company.user'
-        ])->where([
-            'user_id'   => $userInfo->id,
-        ])
+        ])->where($condition)
         ->whereIn('current_status', ['CANCELED', 'COMPLETED'])
         ->orderBy('booking_date', 'DESC')
         ->limit($perPage)
@@ -347,11 +399,39 @@ class APIAppointmentsController extends BaseApiController
     {
         if($request->has('appointment_id'))
         {
+
             $userInfo   = $this->getAuthenticatedUser();
-            $isExist    = $this->repository->model->where([
-                'id'        => $request->get('appointment_id'),
-                'user_id'   => $userInfo->id
-            ])
+            $providerId = access()->getProviderId($userInfo->id);
+            $companyId  = access()->getCompanyId($userInfo->id);
+
+            $condition  = [];
+
+
+            if(!empty($providerId))
+            {
+                $condition  = [
+                    'id'            => $request->get('appointment_id'),
+                    'provider_id'   => $providerId
+                ];
+            }
+
+            if(!empty($companyId))
+            {
+                $condition  = [
+                    'id'            => $request->get('appointment_id'),
+                    'company_id'    => $companyId
+                ];
+            }
+
+            if(count($condition) == 0)
+            {
+                $condition  = [
+                    'id'        => $request->get('appointment_id'),
+                    'user_id'   => $userInfo->id
+                ];
+            }
+
+            $isExist    = $this->repository->model->where($condition)
             ->first();
 
             if(isset($isExist) && count($isExist))
