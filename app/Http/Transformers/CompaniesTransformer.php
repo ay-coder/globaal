@@ -55,9 +55,26 @@ class CompaniesTransformer extends Transformer
                 {   
                     $isConnected = $provider->accept_by_provider == 1 && $provider->accept_by_company == 1 ? 1 : 0;
 
+                    if($provider->accept_by_provider == 1)
+                    {
+                        $isGenerated = 'Provider';
+                    }
+
+                    if($provider->accept_by_company == 1)
+                    {
+                        $isGenerated = 'Company';
+                    }
+
+                    if($isConnected == 1)
+                    {
+                        $isGenerated = '';
+                    }
+
                     $providers[] = [
                         'provider_id'           => (int) $provider->provider_id,
+                        'company_id'            => (int) $provider->company_id,
                         'is_connected'          => $isConnected,
+                        'is_generated'          => $isGenerated,
                         'name'                  => isset($provider->provider) ? $provider->provider->user->name : '',
                         'profile_pic'           => URL::to('/').'/uploads/user/' . $provider->provider->user->profile_pic, 
                     ];
