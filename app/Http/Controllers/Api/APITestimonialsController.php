@@ -246,7 +246,7 @@ class APITestimonialsController extends BaseApiController
             $perPage    = $request->get('per_page') ? $request->get('per_page') : 100;
             $offset     = $request->get('page') ? $request->get('page') : 0;
             $orderBy    = $request->get('orderBy') ? $request->get('orderBy') : 'id';
-            $order      = $request->get('order') ? $request->get('order') : 'ASC';
+            $order      = $request->get('order') ? $request->get('order') : 'DESC';
             $items      = $this->repository->model->with(['user', 'company', 'provider', 'service'])
             ->orderBy($orderBy, $order)
             ->where('company_id', $request->get('company_id'))
@@ -263,8 +263,8 @@ class APITestimonialsController extends BaseApiController
         }
         
         return $this->setStatusCode(400)->failureResponse([
-            'message' => 'Unable to find Testimonials!'
-            ], 'No Testimonials Found !');
+            'message' => 'No Before/After Photos Found!'
+            ], 'No Before/After Photos Found!');
     }
 
      /**
@@ -280,7 +280,7 @@ class APITestimonialsController extends BaseApiController
             $perPage    = $request->get('per_page') ? $request->get('per_page') : 100;
             $offset     = $request->get('page') ? $request->get('page') : 0;
             $orderBy    = $request->get('orderBy') ? $request->get('orderBy') : 'id';
-            $order      = $request->get('order') ? $request->get('order') : 'ASC';
+            $order      = $request->get('order') ? $request->get('order') : 'DESC';
             $items      = $this->repository->model->with(['user', 'company', 'provider', 'service'])
             ->orderBy($orderBy, $order)
             ->where('provider_id', $request->get('provider_id'))
@@ -297,7 +297,7 @@ class APITestimonialsController extends BaseApiController
         }
         
         return $this->setStatusCode(400)->failureResponse([
-            'message' => 'Unable to find Testimonials!'
-            ], 'No Testimonials Found !');
+            'message' => 'No Before/After Photos Found!'
+            ], 'No Before/After Photos Found!');
     }
 }

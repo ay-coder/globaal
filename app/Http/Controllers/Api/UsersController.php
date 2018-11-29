@@ -764,7 +764,7 @@ class UsersController extends BaseApiController
         if($user->save()) 
         {
             $successResponse = [
-                'message' => 'User Logged out successfully.'
+                'message' => 'Logged out Successfully.'
             ];
 
             return $this->successResponse($successResponse);

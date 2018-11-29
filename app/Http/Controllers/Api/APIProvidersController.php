@@ -11,6 +11,7 @@ use App\Models\ProviderServices\ProviderServices;
 use App\Models\CompanyProviders\CompanyProviders;
 use App\Models\Companies\Companies;
 use App\Models\Testimonials\Testimonials;
+use App\Models\Schedules\Schedules;
 use DB;
 
 class APIProvidersController extends BaseApiController
@@ -114,7 +115,7 @@ class APIProvidersController extends BaseApiController
         ->first();
 
 
-        $testimonials = Testimonials::with('service')->where('provider_id', $providerId)->get();
+        $testimonials = Testimonials::with('service')->where('provider_id', $providerId)->orderBy('id', 'desc')->get();
 
         if(isset($item) && count($item))
         {
@@ -305,8 +306,8 @@ class APIProvidersController extends BaseApiController
         
        
         return $this->setStatusCode(400)->failureResponse([
-            'reason' => 'Invalid Inputs or No Requests exists !'
-            ], 'No Data Found');       
+            'reason' => 'No Requests Received'
+            ], 'No Requests Received');       
     }
 
     /**
@@ -524,6 +525,11 @@ class APIProvidersController extends BaseApiController
 
                     if($status)
                     {
+                        Schedules::where([
+                            'provider_id'   => $providerId,
+                            'company_id'    => $request->get('company_id')
+                        ])->delete();
+
                         $message = [
                             'message' => 'Company removed successfully.'
                         ];

@@ -10,6 +10,7 @@ use App\Models\CompanyProviders\CompanyProviders;
 use App\Http\Transformers\ProvidersTransformer;
 use App\Models\Access\User\User;
 use App\Models\Providers\Providers;
+use App\Models\Schedules\Schedules;
 use DB;
 
 class APICompaniesController extends BaseApiController
@@ -403,6 +404,11 @@ class APICompaniesController extends BaseApiController
 
                 if($status)
                 {
+                    Schedules::where([
+                        'provider_id'       => $request->get('provider_id'),
+                        'company_id'        => $companyId
+                    ])->delete();
+
                     $message = [
                         'message' => 'Provider removed successfully.'
                     ];
@@ -442,8 +448,8 @@ class APICompaniesController extends BaseApiController
         }
        
         return $this->setStatusCode(400)->failureResponse([
-            'reason' => 'No Requests found!'
-            ], 'No Requests found!');       
+            'reason' => 'No Requests Received'
+            ], 'No Requests Received');       
     }
 
     /**

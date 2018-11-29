@@ -40,8 +40,9 @@ class CompanyServicesTransformer extends Transformer
                 if(isset($services[$service->service_id]))
                 {
                     $response[] = [
-                        'id'    => (int) $service->service_id,
-                        'title' => $services[$service->service_id]
+                        'id'            => (int) $service->service_id,
+                        'service_id'    => (int) $service->service_id,
+                        'title'         => $services[$service->service_id]
                     ];
                 }
             }

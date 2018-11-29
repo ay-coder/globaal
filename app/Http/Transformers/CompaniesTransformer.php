@@ -81,7 +81,8 @@ class CompaniesTransformer extends Transformer
 
         if(isset($companyInfo->company_testimonials))
         {
-            foreach($companyInfo->company_testimonials as $testimonial)
+            $companyTestimonials = $companyInfo->company_testimonials->sortByDesc('id');
+            foreach($companyTestimonials as $testimonial)
             {
                 $testimonials[] = [
                     'testimonial_id'=> (int) $testimonial->id,
