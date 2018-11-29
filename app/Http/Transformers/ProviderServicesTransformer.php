@@ -40,13 +40,10 @@ class ProviderServicesTransformer extends Transformer
             {
                 foreach($provider->services as $service)   
                 {
-                    if(isset($services[$service->service_id]))
-                    {
-                        $response[] = [
-                            'service_id' => (int) $service->service_id,
-                            'title'      => $services[$service->service_id]['title']
-                        ];
-                    }
+                    $response[] = [
+                        'service_id' => (int) $service->service_id,
+                        'title'      => $this->nulltoBlank($service->service->title)
+                    ];
                 }
             }
         }
