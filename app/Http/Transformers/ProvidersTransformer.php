@@ -171,6 +171,7 @@ class ProvidersTransformer extends Transformer
                     $allCompanies[] = [
                         'company_id'    => (int) $company->company_id,
                         'is_connected'  => $isConnected,
+                        'is_generated'  => $isGenerated,
                         'company_name'  => isset($company->company->company_name) ? $company->company->company_name : '',
                         'profile_pic'   => URL::to('/').'/uploads/user/' . $company->company->user->profile_pic, 
                     ];
