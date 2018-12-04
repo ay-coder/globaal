@@ -153,6 +153,21 @@ class ProvidersTransformer extends Transformer
                 {
                     $isConnected = $company->accept_by_provider == 1 && $company->accept_by_company == 1 ? 1 : 0;
 
+                    if($company->accept_by_provider == 1)
+                    {
+                        $isGenerated = 'Provider';
+                    }
+
+                    if($company->accept_by_company == 1)
+                    {
+                        $isGenerated = 'Company';
+                    }
+
+                    if($isConnected == 1)
+                    {
+                        $isGenerated = '';
+                    }
+
                     $allCompanies[] = [
                         'company_id'    => (int) $company->company_id,
                         'is_connected'  => $isConnected,
