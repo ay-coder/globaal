@@ -236,6 +236,31 @@ class APISchedulesController extends BaseApiController
             ], 'Invalid Inputs or Schedule is already Exists !');
     }
 
+    public function getProvideSchedule(Request $request)
+    {
+        if($request->has('provider_id'))
+        {
+            $conditions = [
+                'provider_id' => $request->get('provider_id')
+            ];
+            
+            $items = $this->repository->model->with([
+                'provider', 'service', 'user', 'company', 'provider.user'
+            ])->where($conditions)->get();
+
+            if(isset($items) && count($items))
+            {
+                $itemsOutput = $this->schedulesTransformer->transformProviderSchedules($items);
+
+                return $this->successResponse($itemsOutput);
+            }
+        }
+
+        return $this->setStatusCode(400)->failureResponse([
+            'reason' => 'No Provider found!'
+            ], 'No Provider found!');
+    }
+
     /**
      * View
      *

@@ -3,6 +3,8 @@ Route::group(['namespace' => 'Api'], function()
 {
     Route::post('appointments', 'APIAppointmentsController@index')->name('appointments.index');
 
+    Route::post('appointments/by-provider', 'APIAppointmentsController@providerAppointments')->name('appointments.by-provider');
+
     Route::post('appointments/past', 'APIAppointmentsController@getPastData')->name('appointments.past');
 
     Route::post('appointments/create', 'APIAppointmentsController@create')->name('appointments.create');

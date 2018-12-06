@@ -105,6 +105,46 @@ class APIAppointmentsController extends BaseApiController
     }
 
     /**
+     * List of All Appointments
+     *
+     * @param Request $request
+     * @return json
+     */
+    public function providerAppointments(Request $request)
+    {
+        if($request->has('provider_id'))
+        {
+            $providerId = $request->get('provider_id');
+            $condition  = [
+                'provider_id' => $providerId
+            ];
+
+            $perPage    = $request->get('per_page') ? $request->get('per_page') : 100;
+            $offset     = $request->get('page') ? $request->get('page') : 0;
+            $items      = $this->repository->model->with([
+                'service', 'user', 'provider', 'provider.user', 'company', 'company.user'
+            ])->where($condition)
+            ->whereDate('booking_date', '>', date('Y-m-d'))
+            ->whereNotIn('current_status', ['CANCELED'])
+            ->orderBy('booking_date')
+            ->limit($perPage)
+            ->offset($offset)
+            ->get();
+
+            if(isset($items) && count($items))
+            {
+                $itemsOutput = $this->appointmentsTransformer->showAllAppointments($items);
+
+                return $this->successResponse($itemsOutput);
+            }
+        }
+        
+        return $this->setStatusCode(400)->failureResponse([
+            'message' => 'Unable to find Appointments!'
+            ], 'No Appointments Found !');
+    }
+
+    /**
      * Get Past Appointments
      *
      * @param Request $request
