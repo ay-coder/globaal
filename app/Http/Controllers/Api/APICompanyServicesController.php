@@ -233,11 +233,11 @@ class APICompanyServicesController extends BaseApiController
             $companyId  = $request->get('company_id') ;
             $isExist    = $this->repository->model->where([
                 'company_id'    => $companyId,
-                'service_id'    => $request->get('service_id'),
-            ])->count();
+                'service_id'    => $request->get('service_id')
+            ])->first();
 
 
-            if(isset($isExist) && $isExist == 0)
+            if(! isset($isExist))
             {
                 return $this->setStatusCode(400)->failureResponse([
                     'reason' => 'No Service Found!'
