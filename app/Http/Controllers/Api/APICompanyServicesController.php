@@ -230,8 +230,9 @@ class APICompanyServicesController extends BaseApiController
         if($request->has('company_id') && $request->has('service_id'))
         {
             $userInfo   = $this->getAuthenticatedUser();
+            $companyId  = $request->get('company_id') ;
             $isExist    = $this->repository->model->where([
-                'user_id'       => $userInfo->id,
+                'company_id'    => $companyId,
                 'service_id'    => $request->get('service_id'),
             ])->count();
 
@@ -239,13 +240,13 @@ class APICompanyServicesController extends BaseApiController
             if(isset($isExist) && $isExist == 0)
             {
                 return $this->setStatusCode(400)->failureResponse([
-                    'reason' => 'No Service Found !'
+                    'reason' => 'No Service Found!'
                 ], 'No Service Found!');
             }
 
             $status = $this->repository->model->where([
-                'user_id'       => $userInfo->id,
-                'service_id'    => $request->get('service_id')
+                'company_id'    => $companyId,
+                'service_id'    => $request->get('service_id'),
             ])->delete();
 
             if($status)
