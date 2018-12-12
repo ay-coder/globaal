@@ -33,11 +33,9 @@ class EloquentMasterCategoriesRepository extends DbRepository
      */
     public $tableHeaders = [
         'id'        => 'Id',
-'title'        => 'Title',
-'description'        => 'Description',
-'created_at'        => 'Created_at',
-'updated_at'        => 'Updated_at',
-"actions"         => "Actions"
+        'title'        => 'Title',
+        'description'        => 'Description',
+        "actions"         => "Actions"
     ];
 
     /**
@@ -61,18 +59,6 @@ class EloquentMasterCategoriesRepository extends DbRepository
 		'description' =>   [
                 'data'          => 'description',
                 'name'          => 'description',
-                'searchable'    => true,
-                'sortable'      => true
-            ],
-		'created_at' =>   [
-                'data'          => 'created_at',
-                'name'          => 'created_at',
-                'searchable'    => true,
-                'sortable'      => true
-            ],
-		'updated_at' =>   [
-                'data'          => 'updated_at',
-                'name'          => 'updated_at',
                 'searchable'    => true,
                 'sortable'      => true
             ],

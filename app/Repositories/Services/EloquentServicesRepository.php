@@ -9,6 +9,7 @@
 use App\Models\Services\Services;
 use App\Repositories\DbRepository;
 use App\Exceptions\GeneralException;
+use App\Models\MasterCategories\MasterCategories;
 
 class EloquentServicesRepository extends DbRepository
 {
@@ -32,13 +33,11 @@ class EloquentServicesRepository extends DbRepository
      * @var array
      */
     public $tableHeaders = [
-        'id'        => 'Id',
-'category_id'        => 'Category_id',
-'title'        => 'Title',
-'description'        => 'Description',
-'created_at'        => 'Created_at',
-'updated_at'        => 'Updated_at',
-"actions"         => "Actions"
+        'id'                => 'Id',
+        'category_title'   => 'Category',
+        'title'         => 'Title',
+        'created_at'    => 'Created At',
+        "actions"       => "Actions"
     ];
 
     /**
@@ -53,9 +52,9 @@ class EloquentServicesRepository extends DbRepository
                 'searchable'    => true,
                 'sortable'      => true
             ],
-		'category_id' =>   [
-                'data'          => 'category_id',
-                'name'          => 'category_id',
+		'category_title' =>   [
+                'data'          => 'category_title',
+                'name'          => 'category_title',
                 'searchable'    => true,
                 'sortable'      => true
             ],
@@ -65,21 +64,10 @@ class EloquentServicesRepository extends DbRepository
                 'searchable'    => true,
                 'sortable'      => true
             ],
-		'description' =>   [
-                'data'          => 'description',
-                'name'          => 'description',
-                'searchable'    => true,
-                'sortable'      => true
-            ],
+		
 		'created_at' =>   [
                 'data'          => 'created_at',
                 'name'          => 'created_at',
-                'searchable'    => true,
-                'sortable'      => true
-            ],
-		'updated_at' =>   [
-                'data'          => 'updated_at',
-                'name'          => 'updated_at',
                 'searchable'    => true,
                 'sortable'      => true
             ],
@@ -159,7 +147,8 @@ class EloquentServicesRepository extends DbRepository
      */
     public function __construct()
     {
-        $this->model = new Services;
+        $this->model            = new Services;
+        $this->categoryModel    = new MasterCategories;
     }
 
     /**
@@ -257,7 +246,8 @@ class EloquentServicesRepository extends DbRepository
     public function getTableFields()
     {
         return [
-            $this->model->getTable().'.*'
+            $this->model->getTable().'.*',
+            $this->categoryModel->getTable().'.title as category_title'
         ];
     }
 
@@ -266,7 +256,10 @@ class EloquentServicesRepository extends DbRepository
      */
     public function getForDataTable()
     {
-        return $this->model->select($this->getTableFields())->get();
+        return  $this->model->select($this->getTableFields())
+                ->leftjoin($this->categoryModel->getTable(), $this->categoryModel->getTable().'.id', '=', $this->model->getTable().'.category_id')->get();
+
+        //return $this->model->select($this->getTableFields())->get();
     }
 
     /**

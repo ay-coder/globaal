@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Yajra\Datatables\Facades\Datatables;
 use App\Repositories\Services\EloquentServicesRepository;
+use App\Models\MasterCategories\MasterCategories;
 
 /**
  * Class AdminServicesController
@@ -66,8 +67,11 @@ class AdminServicesController extends Controller
      */
     public function create(Request $request)
     {
+        $categories = MasterCategories::pluck('title', 'id')->toArray();
+
         return view($this->repository->setAdmin(true)->getModuleView('createView'))->with([
-            'repository' => $this->repository
+            'repository' => $this->repository,
+            'categories' => $categories
         ]);
     }
 
@@ -91,10 +95,12 @@ class AdminServicesController extends Controller
     public function edit($id, Request $request)
     {
         $item = $this->repository->findOrThrowException($id);
+        $categories = MasterCategories::pluck('title', 'id')->toArray();
 
         return view($this->repository->setAdmin(true)->getModuleView('editView'))->with([
             'item'          => $item,
-            'repository'    => $this->repository
+            'repository'    => $this->repository,
+            'categories'    => $categories
         ]);
     }
 

@@ -43,11 +43,14 @@ class CustomJWTMiddleware extends BaseJWTMiddleware
             return $this->respond('tymon.jwt.expired', $respond, $e->getStatusCode(), [$e]);
         } catch (JWTException $e)
         {
+            $invalidTokenCode = 200;
+            $invalidDataCode  = 999;
             $respond = [
                 'success'   => false,
+                'code'      => $invalidDataCode,
                 'message'   => 'Invalid Token - Wrong Token !'
             ];
-            return $this->respond('tymon.jwt.invalid', $respond, $e->getStatusCode(), [$e]);
+            return $this->respond('tymon.jwt.invalid', $respond, $invalidTokenCode, [$e]);
         }
 
         if (! $user)
