@@ -47,6 +47,7 @@ class CustomJWTMiddleware extends BaseJWTMiddleware
             $invalidDataCode  = 999;
             $respond = [
                 'success'   => false,
+                'status'    => false,
                 'code'      => $invalidDataCode,
                 'message'   => 'Invalid Token - Wrong Token !'
             ];
