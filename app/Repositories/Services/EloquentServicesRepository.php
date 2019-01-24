@@ -11,6 +11,8 @@ use App\Repositories\DbRepository;
 use App\Exceptions\GeneralException;
 use App\Models\Appointments\Appointments;
 use App\Models\MasterCategories\MasterCategories;
+use App\Models\CompanyServices\CompanyServices;
+use App\Models\ProviderServices\ProviderServices;
 
 class EloquentServicesRepository extends DbRepository
 {
@@ -206,6 +208,9 @@ class EloquentServicesRepository extends DbRepository
         if($model)
         {
             Appointments::where('service_id', $id)->delete();
+            CompanyServices::where('service_id', $id)->delete();
+            ProviderServices::where('service_id', $id)->delete();
+
             return $model->delete();
         }
 

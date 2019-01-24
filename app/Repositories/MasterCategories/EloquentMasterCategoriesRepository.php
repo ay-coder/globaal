@@ -9,6 +9,11 @@
 use App\Models\MasterCategories\MasterCategories;
 use App\Repositories\DbRepository;
 use App\Exceptions\GeneralException;
+use App\Models\Services\Services;
+use App\Models\Appointments\Appointments;
+use App\Models\CompanyServices\CompanyServices;
+use App\Models\ProviderServices\ProviderServices;
+
 
 class EloquentMasterCategoriesRepository extends DbRepository
 {
@@ -194,6 +199,16 @@ class EloquentMasterCategoriesRepository extends DbRepository
 
         if($model)
         {
+            $services = Services::where('category_id', $id)->get();
+
+            foreach($services as $service)
+            {
+                Appointments::where('service_id', $service->id)->delete();
+                CompanyServices::where('service_id', $service->id)->delete();
+                ProviderServices::where('service_id', $service->id)->delete();
+                Services::where('id', $service->id)->delete();
+            }
+
             return $model->delete();
         }
 
