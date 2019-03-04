@@ -24,7 +24,7 @@ class Appointments extends BaseModel
      *
      */
     protected $fillable = [
-        "id", "user_id", "provider_id", "service_id", "company_id", "booking_date", "start_time", "end_time", "current_status", "status", "created_at", "updated_at", 
+        "id", "user_id", "provider_id", "service_id", "company_id", "booking_date", "start_time", "end_time", "current_status", "booked_by_company", "status", "created_at", "updated_at", 
     ];
 
     /**

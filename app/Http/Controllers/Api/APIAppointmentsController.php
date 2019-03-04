@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\BaseApiController;
 use App\Models\Access\User\User;
 use App\Models\Providers\Providers;
 use App\Models\Companies\Companies;
+use App\Models\Access\User\User;
 use App\Repositories\Appointments\EloquentAppointmentsRepository;
 use DateTime;
 
@@ -85,6 +86,7 @@ class APIAppointmentsController extends BaseApiController
         $items      = $this->repository->model->with([
             'service', 'user', 'provider', 'provider.user', 'company', 'company.user'
         ])->where($condition)
+        ->where('booked_by_company', '0')
         ->whereDate('booking_date', '>', date('Y-m-d'))
         ->whereNotIn('current_status', ['CANCELED'])
         ->orderBy('booking_date')
@@ -323,6 +325,160 @@ class APIAppointmentsController extends BaseApiController
                 }
 
                 
+
+                // Push Notification
+                access()->sentPushNotification($provider->user, $payload);
+                access()->sentPushNotification($companyInfo->user, $companyPayload);
+
+                $responseData = [
+                    'message' => 'Appointments is Created Successfully'
+                ];
+                return $this->successResponse($responseData, 'Appointments is Created Successfully');
+            }
+        }
+        
+        return $this->setStatusCode(400)->failureResponse([
+            'reason' => 'Invalid Inputs'
+            ], 'Something went wrong !');
+    }
+
+    /**
+     * Create by Company
+     *
+     * @param Request $request
+     * @return string
+     */
+    public function createByCompany(Request $request)
+    {
+        if($request->has('provider_id')  && $request->has('service_id') && $request->has('booking_date') && $request->has('start_time') && $request->has('end_time') && $request->has('email') && $request->has('name'))
+        {
+            $date       = date('Y-m-d');
+            $userInfo   = $this->getAuthenticatedUser();
+            $companyId  = access()->getCompanyId($userInfo->id);
+            $bookings   = $this->repository->model->where([
+                'provider_id'   => $request->get('provider_id'),
+                'service_id'    => $request->get('service_id'),
+                'company_id'    => $companyId,
+                'booking_date'  => $request->get('booking_date'),
+            ])
+            ->where('status', '!=', 'CANCELED')
+            ->get();
+
+            if(isset($bookings) && count($bookings))
+            {
+                foreach($bookings as $booking)
+                {
+                    /*$startTime   = strtotime($date.$booking->start_time);
+                    $actualStart = strtotime($date.$request->get('start_time'));
+                    $actualEnd   = strtotime($date.$request->get('end_time'));*/
+
+                    $startTime = DateTime::createFromFormat('H:i', $request->get('start_time'))->format('H:i:s');
+                    $endTime = DateTime::createFromFormat('H:i', $request->get('end_time'))->format('H:i:s');
+
+                    $query = $this->repository->model->where([
+                        'provider_id'   => $request->get('provider_id'),
+                        'service_id'    => $request->get('service_id'),
+                        'company_id'    => $companyId,
+                        'booking_date'  => $request->get('booking_date'),
+                    ])
+                    ->where('current_status', '!=', 'CANCELED');
+
+                    if($startTime)
+                    {
+                        $query->whereBetween('start_time',  [$startTime, $endTime])
+                        ->orWhereBetween('end_time',  [$startTime, $endTime]);
+                    }
+
+                    $timeAllow = $query->get();
+
+                    if(isset($timeAllow) && count($timeAllow))
+                    {
+                        return $this->setStatusCode(400)->failureResponse([
+                            'reason' => 'Some one already booked this Schedule Please change booking time and try.'
+                            ], 'Some one already booked this Schedule Please change booking time and try.');
+                    }
+                }
+            }
+            
+
+            $isUserExist = User::where('email', $this->request->get('email_id'))->first();
+            $userId      = null;
+
+            if(isset($isUserExist) && isset($isUserExist->id))
+            {
+                $userId = $isUserExist->id;
+            }
+            else
+            {
+                $user = User::create([
+                    'name'  => $this->request->get('name'),
+                    'email' => $this->request->get('email')
+                ]);
+
+                $userId = $user->id;
+            }
+
+            $status = $this->repository->model->create([
+                'user_id'            => $userId,
+                'provider_id'        => $request->get('provider_id'),
+                'service_id'         => $request->get('service_id'),
+                'company_id'         => $companyId,
+                'booking_date'       => $request->get('booking_date'),
+                'start_time'         => $request->get('start_time'),
+                'end_time'           => $request->get('end_time'),
+                'booked_by_company'  => 1
+            ]);
+
+            if($status)
+            {
+                $provider   = Providers::with('user')->where('id', $request->get('provider_id'))->first();
+                $companyInfo = Companies::where('id', $request->get('company_id'))->with('user')->first();
+                $text        = $userInfo->name . ' has booked an appointment for ' . $request->get('booking_date') . ' ' . $request->get('start_time') . ' To '. $request->get('end_time') . '.'; 
+
+                $companyText = $userInfo->name . ' has booked an appointment for ' . $request->get('booking_date') . ' ' .  $request->get('start_time') . ' To '.$request->get('end_time') . ' with '.  $provider->user->name;
+
+                $payload    = [
+                            'mtitle'        => '',
+                            'mdesc'         => $text,
+                            'provider_id'   => $request->get('provider_id'),
+                            'company_id'    => $companyId,
+                            'ntype'         => 'NEW_APPOINTMENT_BOOKED'
+                ];
+
+                $companyPayload    = [
+                            'mtitle'        => '',
+                            'mdesc'         => $companyText,
+                            'provider_id'   => $request->get('provider_id'),
+                            'company_id'    => $companyId,
+                            'ntype'         => 'NEW_APPOINTMENT_BOOKED'
+                ];
+
+                $storeNotification = [
+                    'user_id'       => $provider->user->id,
+                    'title'         => $text,
+                    'service_id'    => $request->get('service_id'),
+                    'provider_id'   => $request->get('provider_id'),
+                    'company_id'    => $companyId,
+                    'patient_id'    => $userInfo->id,
+                    'notification_type' => 'NEW_APPOINTMENT_BOOKED'
+                ];
+
+                // Add Notification
+                access()->addNotification($storeNotification);
+
+                if(isset($companyInfo->user))
+                {
+                    $storeCompanyNotification = [
+                        'user_id'       => $companyInfo->user->id,
+                        'title'         => $companyText,
+                        'provider_id'   => $request->get('provider_id'),
+                        'service_id'    => $request->get('service_id'),
+                        'company_id'    => $companyId,
+                        'patient_id'    => $userInfo->id,
+                        'notification_type' => 'NEW_APPOINTMENT_BOOKED'
+                    ];
+                    access()->addNotification($storeCompanyNotification);
+                }
 
                 // Push Notification
                 access()->sentPushNotification($provider->user, $payload);
