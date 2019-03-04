@@ -11,6 +11,8 @@ Route::group(['namespace' => 'Api'], function()
 
     Route::post('appointments/create-by-company', 'APIAppointmentsController@createByCompany')->name('appointments.create-by-company');
 
+    Route::get('appointments/created-by-company', 'APIAppointmentsController@createdByCompany')->name('appointments.created-by-company');
+
     Route::post('appointments/cancel', 'APIAppointmentsController@cancel')->name('appointments.cancel');
 
     Route::post('appointments/edit', 'APIAppointmentsController@edit')->name('appointments.edit');
