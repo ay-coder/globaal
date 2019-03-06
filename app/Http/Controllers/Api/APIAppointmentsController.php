@@ -7,7 +7,6 @@ use App\Http\Controllers\Api\BaseApiController;
 use App\Models\Access\User\User;
 use App\Models\Providers\Providers;
 use App\Models\Companies\Companies;
-use App\Models\Access\User\User;
 use App\Repositories\Appointments\EloquentAppointmentsRepository;
 use DateTime;
 
@@ -119,16 +118,19 @@ class APIAppointmentsController extends BaseApiController
         $companyId  = access()->getCompanyId($userInfo->id);
 
         $condition  = [
-            'company_id' => $companyId
+            
         ];
        
         $perPage    = $request->get('per_page') ? $request->get('per_page') : 100;
         $offset     = $request->get('page') ? $request->get('page') : 0;
         $items      = $this->repository->model->with([
             'service', 'user', 'provider', 'provider.user', 'company', 'company.user'
-        ])->where($condition)
-        ->where('booked_by_company', '1')
-        ->whereDate('booking_date', '>', date('Y-m-d'))
+        ])
+        ->where([
+            'company_id'        => $companyId,
+            'booked_by_company' => 1
+        ])
+        /*->whereDate('booking_date', '>', date('Y-m-d'))*/
         ->whereNotIn('current_status', ['CANCELED'])
         ->orderBy('booking_date')
         ->limit($perPage)
@@ -442,7 +444,7 @@ class APIAppointmentsController extends BaseApiController
             }
             
 
-            $isUserExist = User::where('email', $this->request->get('email_id'))->first();
+            $isUserExist = User::where('email', $request->get('email'))->first();
             $userId      = null;
 
             if(isset($isUserExist) && isset($isUserExist->id))
@@ -452,8 +454,8 @@ class APIAppointmentsController extends BaseApiController
             else
             {
                 $user = User::create([
-                    'name'  => $this->request->get('name'),
-                    'email' => $this->request->get('email')
+                    'name'  => $request->get('name'),
+                    'email' => $request->get('email')
                 ]);
 
                 $userId = $user->id;
@@ -473,18 +475,18 @@ class APIAppointmentsController extends BaseApiController
             if($status)
             {
                 $provider   = Providers::with('user')->where('id', $request->get('provider_id'))->first();
-                $companyInfo = Companies::where('id', $request->get('company_id'))->with('user')->first();
+                $companyInfo = Companies::where('id', $companyId)->with('user')->first();
                 $text        = $userInfo->name . ' has booked an appointment for ' . $request->get('booking_date') . ' ' . $request->get('start_time') . ' To '. $request->get('end_time') . '.'; 
 
                 $companyText = $userInfo->name . ' has booked an appointment for ' . $request->get('booking_date') . ' ' .  $request->get('start_time') . ' To '.$request->get('end_time') . ' with '.  $provider->user->name;
 
-                $payload    = [
+                /*$payload    = [
                             'mtitle'        => '',
                             'mdesc'         => $text,
                             'provider_id'   => $request->get('provider_id'),
                             'company_id'    => $companyId,
                             'ntype'         => 'NEW_APPOINTMENT_BOOKED'
-                ];
+                ];*/
 
                 $companyPayload    = [
                             'mtitle'        => '',
@@ -494,7 +496,7 @@ class APIAppointmentsController extends BaseApiController
                             'ntype'         => 'NEW_APPOINTMENT_BOOKED'
                 ];
 
-                $storeNotification = [
+                /*$storeNotification = [
                     'user_id'       => $provider->user->id,
                     'title'         => $text,
                     'service_id'    => $request->get('service_id'),
@@ -505,7 +507,7 @@ class APIAppointmentsController extends BaseApiController
                 ];
 
                 // Add Notification
-                access()->addNotification($storeNotification);
+                access()->addNotification($storeNotification);*/
 
                 if(isset($companyInfo->user))
                 {
@@ -522,7 +524,7 @@ class APIAppointmentsController extends BaseApiController
                 }
 
                 // Push Notification
-                access()->sentPushNotification($provider->user, $payload);
+                //access()->sentPushNotification($provider->user, $payload);
                 access()->sentPushNotification($companyInfo->user, $companyPayload);
 
                 $responseData = [
