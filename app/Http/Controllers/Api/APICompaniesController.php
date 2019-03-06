@@ -587,6 +587,7 @@ class APICompaniesController extends BaseApiController
         $distance   = [];
         $lat        = $request->has('lat') ? $request->get('lat') : false;
         $long       = $request->has('long') ? $request->get('long') : false;
+        $providerIds = $request->has('provider_type_ids') ? $request->get('provider_type_ids') : false;
 
         $query      = $this->providerRepository->model->whereHas('services', function($q) use($serviceId)
         {
@@ -599,6 +600,16 @@ class APICompaniesController extends BaseApiController
         if($experience)
         {
             $query->whereIn('level_of_experience',$experience);
+        }
+
+        if($providerIds)
+        {
+            $providerIds = explode(',', $providerIds);
+
+            if(isset($providerIds) && count($providerIds))
+            {
+                $query->whereIn('id', $providerIds);
+            }
         }
 
         if($keyword)

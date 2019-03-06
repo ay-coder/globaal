@@ -44,6 +44,13 @@
                 </a>
             </li>
 
+            <li class="{{ active_class(Active::checkUriPattern('admin/providertypes')) }}">
+                <a href="{{ route('admin.providertypes.index') }}">
+                    <i class="fa fa-dashboard"></i>
+                    <span>Manage Provider Types</span>
+                </a>
+            </li>
+
             <li class="{{ active_class(Active::checkUriPattern('admin/services')) }}">
                 <a href="{{ route('admin.services.index') }}">
                     <i class="fa fa-dashboard"></i>

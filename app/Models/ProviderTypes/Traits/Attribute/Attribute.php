@@ -52,6 +52,7 @@ trait Attribute
         $repository = new EloquentProviderTypesRepository;
         $routes     = $repository->getModuleRoutes();
 
-        return $this->getEditButtonAttribute($routes, $repository->adminRoutePrefix, true) . $this->getDeleteButtonAttribute($routes, $repository->adminRoutePrefix);
+        return $this->getEditButtonAttribute($routes, $repository->adminRoutePrefix, true);
+        /// . $this->getDeleteButtonAttribute($routes, $repository->adminRoutePrefix);
     }
 }
