@@ -33,10 +33,9 @@ class EloquentExperiencesRepository extends DbRepository
      */
     public $tableHeaders = [
         'id'        => 'Id',
-'level_of_experience'        => 'Level_of_experience',
-'created_at'        => 'Created_at',
-'updated_at'        => 'Updated_at',
-"actions"         => "Actions"
+        'level_of_experience'        => 'Level Of Experience',
+        'created_at'        => 'Created At',
+        "actions"         => "Actions"
     ];
 
     /**
@@ -63,13 +62,7 @@ class EloquentExperiencesRepository extends DbRepository
                 'searchable'    => true,
                 'sortable'      => true
             ],
-		'updated_at' =>   [
-                'data'          => 'updated_at',
-                'name'          => 'updated_at',
-                'searchable'    => true,
-                'sortable'      => true
-            ],
-		'actions' => [
+		  'actions' => [
             'data'          => 'actions',
             'name'          => 'actions',
             'searchable'    => false,
